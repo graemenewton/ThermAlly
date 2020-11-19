@@ -297,7 +297,7 @@ void loop()
 
 /* Code below regultes the RGB PWM numbers for the RGB LED - this is used so operators can guage the temperature based on LED colour from a distance without having to get close to the screen. */
 
-LEDTempColour(); //custom function for assigning PWM integers based on bath temperature for LED colouring
+LEDTempColour(); //custom function for assigning PWM integers based on bath temperature for LED colouring, function defined in LEDTempColour Tab
   
 //use PWM numbers set above to control colour of RGB LED.
   analogWrite(TempLEDRedPin, TempLEDRedPWM);
