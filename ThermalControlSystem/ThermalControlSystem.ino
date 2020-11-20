@@ -275,20 +275,10 @@ void setup()
 void loop()
 {
 
-/* Print temperature values to Serial Bus and LCD. Hot Junction is the probe temp, Cold Junction is the reference built into the Adafruit MCP9600 I2C board  */
+TCSerialPrint(); //uses custom function to print Theromcouple paramaters to Serial port. See TCSerialPrint.ino tab
 
-  Serial.print("Hot Junction 1: "); Serial.println(mcp1.readThermocouple()); Serial.print(" ºC");
-  Serial.print("Cold Junction 1: "); Serial.println(mcp1.readAmbient()); Serial.print(" ºC");
-  Serial.print("Hot Junction 2: "); Serial.println(mcp2.readThermocouple()); Serial.print(" ºC");
-  Serial.print("Cold Junction 2: "); Serial.println(mcp2.readAmbient()); Serial.print(" ºC");
-  Serial.print("ADC: "); Serial.print(mcp1.readADC() * 2); Serial.println(" uV");
-  Serial.print("ADC: "); Serial.print(mcp2.readADC() * 2); Serial.println(" uV");
+TCLCDPrint(); //uses custom function to print Theromcouple parameters to LCD display. See TCLCDPrint.ino tab
 
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("T1="); lcd.print(mcp1.readThermocouple()); lcd.print(" R1="); lcd.print(mcp1.readAmbient()); //read theromcouple and print straight to LCD
-  lcd.setCursor(0, 1);
-  lcd.print("T2="); lcd.print(mcp2.readThermocouple()); lcd.print(" R2="); lcd.print(mcp2.readAmbient());
 
 /* Store temperatures for T1 and T2 as variables */
 
@@ -297,7 +287,7 @@ void loop()
 
 /* Code below regultes the RGB PWM numbers for the RGB LED - this is used so operators can guage the temperature based on LED colour from a distance without having to get close to the screen. */
 
-LEDTempColour(); //custom function for assigning PWM integers based on bath temperature for LED colouring, function defined in LEDTempColour Tab
+LEDTempColour(); //custom function for assigning PWM integers based on bath temperature for LED colouring, function defined in LEDTempColour.ino Tab
   
 //use PWM numbers set above to control colour of RGB LED.
   analogWrite(TempLEDRedPin, TempLEDRedPWM);

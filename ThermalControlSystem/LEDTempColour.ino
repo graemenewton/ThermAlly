@@ -1,3 +1,4 @@
+/* CUSTOM FUNCTION FOR ASSIGNING PWM VALUE FOR RGB LED TEMPERATURE-DEPENDANT COLOURING */
 /* Code below regultes the RGB PWM numbers for the RGB LED - this is used so operators can guage the temperature based on LED colour from a distance without having to get close to the screen. */
 
 
