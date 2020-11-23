@@ -23,7 +23,6 @@
 
 
 
-
 #include <Wire.h> //This library allows you to communicate with I2C / TWI devices
 #include <Adafruit_I2CDevice.h> //
 #include <Adafruit_I2CRegister.h>
@@ -48,7 +47,7 @@ float T2Temp; //T2Temp is bath, store as float T2Temp // e.g. 7/2 is 3.5 but thi
 
 /* Syntax for LCD pin numbers:
 LiquidCrystal(rs, enable, d4, d5, d6, d7)
-LiquidCrystal(rs, rw, enable, d4, d5, d6, d7)
+LiquidCrystal(rs, rw, enable, d4, d5, d6, d7) <------------- this one used
 LiquidCrystal(rs, enable, d0, d1, d2, d3, d4, d5, d6, d7)
 LiquidCrystal(rs, rw, enable, d0, d1, d2, d3, d4, d5, d6, d7) */
 
@@ -267,7 +266,7 @@ void setup()
     case MCP9600_ADCRESOLUTION_12:   lcd.print("12"); break;
   }
   lcd.print(".");
-  delay(12000); //wait to allow user to read
+  delay(10000); //wait to allow user to read
   lcd.clear();
 
 /* Code can be added here to set alerts. These can be used for safety features such as to shut off in the case of overheating. */
@@ -292,8 +291,15 @@ void setup()
   lcd.print("  Ready to operate!");
   digitalWrite(BusyLEDPin, LOW);
   digitalWrite(ReadyToOperateLEDPin, HIGH);
-
   delay(1000); //slight delay before starting loop, the message will be displayed until something new is overwritten
+
+/* The ADC and DAC resolution is set to 10 bit by default for compatability purposes with other arduino boards, however, the Due is capable of higher resolution. */
+  analogReadResolution(12); //12 bits is maximum resolution which can be run on the Arduino Due, this command will unlock the best possible ADC resolution for us.
+  analogWriteResolution(12); //12 bits is maximum resolution which can be run on the Arduino Due, this command will unlock the best possible DAC/PWM resolution for us.
+  // analogWrite() is 8 bits by default (0-255), changing this means it will now be 0-4095. analogRead() is 10 bits (0-1023) by default, chaning this means it
+  // would now be 0-4095. The map() function is useful here, e.g. map(sensorVal, 0, 1023, 0, 4095)) - this would essentially scale 10 bits to 12 bits.
+
+  
 }
 
 

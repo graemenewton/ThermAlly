@@ -2,6 +2,7 @@
 
 /* Print temperature values to Serial Bus and LCD. Hot Junction is the probe temp, Cold Junction is the reference built into the Adafruit MCP9600 I2C board  */
 // Serial.print(value, 4) prints 4 decimal places if value is float for example
+// The raw ADC resolution in 18-bit mode is 0.5 uV. So multiplying by 2 gives you a reading in uV. Hence why *2 is seen below when print voltage.
 
 
 void TCSerialPrint()
