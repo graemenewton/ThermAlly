@@ -1,4 +1,28 @@
  //Useful notes: Arduino due uses 3.3V logic, digital pins output 130mA.
+ // 10 bits resolution returns values between 0-1023, 8 bits resolution returns values between 0-255, 12 bits resolution returns values between 0-4096
+
+
+//direct from MCP_9600 github, converstion to celcius is by *0.0625
+ /* float Adafruit_MCP9600::readThermocouple(void) {      
+ // if (!enabled()) {
+ // return NAN; }
+
+ // define the register
+ // Adafruit_I2CRegister therm_reg =
+ //   Adafruit_I2CRegister(i2c_dev, MCP9600_HOTJUNCTION, 2, MSBFIRST);
+
+ // read a signed 16 bit value
+ // int16_t therm = therm_reg.read();
+ 
+ // convert to floating and shift to celsius
+ // float temp = therm;
+ // temp *= 0.0625; // 0.0625*C per LSB!
+ // return temp;
+ */
+
+
+
+
 
 #include <Wire.h> //This library allows you to communicate with I2C / TWI devices
 #include <Adafruit_I2CDevice.h> //
@@ -17,7 +41,8 @@ int TempLEDGreenPWM;
 int TempLEDBluePWM;
 
 
-float T1Temp; //T1Temp is heat exchanger, store as float T1Temp //note that floats must be used in equations as dividing integers will cause errors as they cannot have decimal points.
+float T1Temp; //T1Temp is heat exchanger, store as float T1Temp //note that floats must be used in equations as dividing integers will cause errors as they 
+              //cannot have decimal points.
 float T2Temp; //T2Temp is bath, store as float T2Temp // e.g. 7/2 is 3.5 but this will not work with integer notation
 
 
@@ -285,7 +310,8 @@ TCLCDPrint(); //uses custom function to print Theromcouple parameters to LCD dis
   T1Temp = mcp1.readThermocouple(); //T1Temp is heat exchanger, store as float T1Temp
   T2Temp = mcp2.readThermocouple(); //T2Temp is bath, store as float T2Temp
 
-/* Code below regultes the RGB PWM numbers for the RGB LED - this is used so operators can guage the temperature based on LED colour from a distance without having to get close to the screen. */
+/* Code below regultes the RGB PWM numbers for the RGB LED - this is used so operators can guage the temperature based on LED colour from a distance 
+without having to get close to the screen. */
 
 LEDTempColour(); //custom function for assigning PWM integers based on bath temperature for LED colouring, function defined in LEDTempColour.ino Tab
   

@@ -1,6 +1,9 @@
 /* CUSTOM FUNCTION FOR ASSIGNING PWM VALUE FOR RGB LED TEMPERATURE-DEPENDANT COLOURING */
-/* Code below regultes the RGB PWM numbers for the RGB LED - this is used so operators can guage the temperature based on LED colour from a distance without having to get close to the screen. */
+/* Code below regultes the RGB PWM numbers for the RGB LED - this is used so operators can guage the temperature based on LED colour from a distance 
+without having to get close to the screen. */
 
+//based on the fact that only one PWM number changes at a time, I think I could scale this better.
+//i.e. the colour would flow from blue to cyan from 0C to 15C, then from cyan to green from 15 to 30
 
 void LEDTempColour()
 {
