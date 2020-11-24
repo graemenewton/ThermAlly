@@ -297,8 +297,8 @@ void setup()
   analogReadResolution(12); //12 bits is maximum resolution which can be run on the Arduino Due, this command will unlock the best possible ADC resolution for us.
   analogWriteResolution(12); //12 bits is maximum resolution which can be run on the Arduino Due, this command will unlock the best possible DAC/PWM resolution for us.
   // analogWrite() is 8 bits by default (0-255), changing this means it will now be 0-4095. analogRead() is 10 bits (0-1023) by default, chaning this means it
-  // would now be 0-4095. The map() function is useful here, e.g. map(sensorVal, 0, 1023, 0, 4095)) - this would essentially scale 10 bits to 12 bits.
-
+  // would now be 0-4095. The map() function is useful here, e.g. map(sensorVal, 0, 1023, 0, 4095) - this would essentially scale 10 bits to 12 bits.
+ 
   
 }
 
@@ -322,9 +322,9 @@ without having to get close to the screen. */
 LEDTempColour(); //custom function for assigning PWM integers based on bath temperature for LED colouring, function defined in LEDTempColour.ino Tab
   
 //use PWM numbers set above to control colour of RGB LED.
-  analogWrite(TempLEDRedPin, TempLEDRedPWM);
-  analogWrite(TempLEDGreenPin, TempLEDGreenPWM);
-  analogWrite(TempLEDBluePin, TempLEDBluePWM);
+  analogWrite(TempLEDRedPin, map(TempLEDRedPWM, 0, 255, 0, 4095));
+  analogWrite(TempLEDGreenPin, map(TempLEDGreenPWM, 0, 255, 0, 4095));
+  analogWrite(TempLEDBluePin, map(TempLEDBluePWM, 0, 255, 0, 4095));
 
   delay(100); //repeat this every 100ms
   
