@@ -9,12 +9,15 @@ void setup() {
   pinMode(DACInPin, INPUT);
   pinMode(lowPin, OUTPUT);
   Serial.begin(9600);
+
+  analogReadResolution(12);
+  analogWriteResolution(12);
 }
 
 void loop() {
   digitalWrite(lowPin, LOW);
   AFloat = analogRead(0);
-  voltage = (AFloat*3.3/1023);
+  voltage = (AFloat*3.3/4095);
 Serial.print(digitalRead(DACInPin)); Serial.print(" "); Serial.print(analogRead(APin)); Serial.print(" "); Serial.println(voltage);
 delay(100);
 
