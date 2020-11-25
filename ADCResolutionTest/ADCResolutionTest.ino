@@ -5,11 +5,15 @@
 
 const int PotPin = A0;   // potentiometer connected to analog pin 0
 int DACOut = 0; 
-const int DACIn = A1;
+const int DACInPin = A1;
+float DACIn;
         
 
 
 void setup() {
+
+pinMode(12, OUTPUT);
+digitalWrite(12, LOW);
 
 analogReadResolution(12);
 analogWriteResolution(12);
@@ -18,7 +22,9 @@ analogWriteResolution(12);
 
 void loop() {
   DACOut = analogRead(PotPin);  // read the input pin
-  analogWrite(DAC0, DACOut); 
+  analogWrite(DAC0, DACOut);
+  DACIn = analogRead(DACInPin);
+   
 Serial.print("Pot:" ); Serial.print(analogRead(PotPin)); Serial.print(" "); Serial.print("DACOut: "); Serial.print(DACOut); Serial.print(" "); 
 Serial.print("DACIn: "); Serial.println(analogRead(DACIn)*(3.3/4095), 4);
 delay(100);
