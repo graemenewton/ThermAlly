@@ -26,6 +26,6 @@ void loop() {
   DACIn = analogRead(DACInPin);
    
 Serial.print("Pot:" ); Serial.print(analogRead(PotPin)); Serial.print(" "); Serial.print("DACOut: "); Serial.print(DACOut); Serial.print(" "); 
-Serial.print("DACIn: "); Serial.println(analogRead(DACInPin));
+Serial.print("DACIn: "); Serial.println(analogRead(DACIn)*(3.3/4095), 4);
 delay(100);
 }
