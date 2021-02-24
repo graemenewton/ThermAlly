@@ -29,6 +29,11 @@
 #include <Adafruit_MCP9600.h> //delete this if works, changes "" at ends <>.
 #include <LiquidCrystal.h> //allows for easy interfacing with LCD display using digital pins. Requires no I2C adapter.
 
+/* Analog Pins */
+const int PotPin1 = A0; //10 turn potentiometer
+const int PotPin2 = A1; //3 turn potentiometer
+
+
 /* Digital Pins */
 //const int sets constant integers, such as pin numbers.
 
@@ -49,26 +54,26 @@ const int LCDD5 = 26;
 const int LCDD6 = 27;
 const int LCDD7 = 28;
 //Button Signals
-const int GreenButtonSignal = 30;
-const int RedButtonSignal = 31;
-const int YellowButtonSignal1 = 32;
-const int YellowButtonSignal2 = 33;
-const int YellowButtonSignal3 = 34;
-const int YellowButtonSignal4 = 35;
+const int GreenButtonSignalPin = 30;
+const int RedButtonSignalPin = 31;
+const int YellowButtonSignal1Pin = 32;
+const int YellowButtonSignal2Pin = 33;
+const int YellowButtonSignal3Pin = 34;
+const int YellowButtonSignal4Pin = 35;
 //Peltier Enable Signals
-const int PeltierLEnable = 36;
-const int PeltierREnable = 37;
+const int PeltierLEnablePin = 36;
+const int PeltierREnablePin = 37;
 //LEDs
 const int RedLEDPin = 45;
 const int GreenLEDPin = 46; 
 const int YellowLEDPin = 47;
 //Button LEDs
-const int GreenButtonLED = 48;
-const int RedButtonLED = 49;
-const int YellowButtonLED1 = 50;
-const int YellowButtonLED2 = 51;
-const int YellowButtonLED3 = 52;
-const int YellowButtonLED4 = 53;
+const int GreenButtonLEDPin = 48;
+const int RedButtonLEDPin = 49;
+const int YellowButtonLED1Pin = 50;
+const int YellowButtonLED2Pin = 51;
+const int YellowButtonLED3Pin = 52;
+const int YellowButtonLED4Pin = 53;
 
 
 /* Integers */
