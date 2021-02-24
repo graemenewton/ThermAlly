@@ -22,24 +22,47 @@
 
 
 
-
+/* Libraries */
 #include <Wire.h> //This library allows you to communicate with I2C / TWI devices
 #include <Adafruit_I2CDevice.h> //
 #include <Adafruit_I2CRegister.h>
 #include <Adafruit_MCP9600.h> //delete this if works, changes "" at ends <>.
 #include <LiquidCrystal.h> //allows for easy interfacing with LCD display using digital pins. Requires no I2C adapter.
 
-const int ReadyToOperateLEDPin = 53; //const int sets constant integers, such as pin numbers.
-const int BusyLEDPin = 51;
-const int TempLEDRedPin = 2;
-const int TempLEDGreenPin = 3;
-const int TempLEDBluePin = 4;
+/* Digital Pins */
+//const int sets constant integers, such as pin numbers.
 
+//LCD
+
+
+//LEDs
+const int RedLEDPin = 45;
+const int GreenLEDPin = 46; 
+const int YellowLEDPin = 47;
+//Button LEDs
+const int YellowButtonLED1 = 50;
+const int YellowButtonLED2 = 51;
+const int YellowButtonLED3 = 52;
+const int YellowButtonLED4 = 53;
+
+
+/* PWM Pins */
+const int HeatPWMPin = 2;
+const int FanPWMPin = 3;
+const int PeltierLPWMPin = 4;
+const int PeltierRPWMPin = 5;
+const int TempLEDRedPin = 6;
+const int TempLEDGreenPin = 7;
+const int TempLEDBluePin = 8;
+
+
+/* Integers */
 int TempLEDRedPWM; //int set integers (whole numbers) which can be masked for PWM outs and ADC reads.
 int TempLEDGreenPWM;
 int TempLEDBluePWM;
 
 
+/* Floats */
 float T1Temp; //T1Temp is heat exchanger, store as float T1Temp //note that floats must be used in equations as dividing integers will cause errors as they 
               //cannot have decimal points.
 float T2Temp; //T2Temp is bath, store as float T2Temp // e.g. 7/2 is 3.5 but this will not work with integer notation
@@ -62,14 +85,14 @@ void setup()
 {
 /* Set the pins. */
 
-  pinMode(ReadyToOperateLEDPin, OUTPUT);
-  pinMode(BusyLEDPin, OUTPUT);
+  pinMode(GreenLEDPin, OUTPUT);
+  pinMode(RedLEDPin, OUTPUT);
   pinMode(TempLEDRedPin, OUTPUT);
   pinMode(TempLEDGreenPin, OUTPUT);
   pinMode(TempLEDBluePin, OUTPUT);
 
-  digitalWrite(ReadyToOperateLEDPin, LOW);
-  digitalWrite(BusyLEDPin, HIGH);
+  digitalWrite(GreenLEDPin, LOW);
+  digitalWrite(RedLEDPin, HIGH);
 
 /* Print startup message to LCD. */
 
@@ -289,8 +312,8 @@ void setup()
   lcd.print("   Setup Complete!");
   lcd.setCursor(0, 2);
   lcd.print("  Ready to operate!");
-  digitalWrite(BusyLEDPin, LOW);
-  digitalWrite(ReadyToOperateLEDPin, HIGH);
+  digitalWrite(RedLEDPin, LOW);
+  digitalWrite(GreenLEDPin, HIGH);
   delay(1000); //slight delay before starting loop, the message will be displayed until something new is overwritten
 
 /* The ADC and DAC resolution is set to 10 bit by default for compatability purposes with other arduino boards, however, the Due is capable of higher resolution. */
