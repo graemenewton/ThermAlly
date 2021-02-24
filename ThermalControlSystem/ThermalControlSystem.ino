@@ -47,7 +47,7 @@ const int TempLEDGreenPin = 7;
 const int TempLEDBluePin = 8;
 //LCD
 const int LCDRS = 22;
-const int LCDRW= 23;
+const int LCDRW = 23;
 const int LCDEnable = 24;
 const int LCDD4 = 25;
 const int LCDD5 = 26;
@@ -76,13 +76,13 @@ const int YellowButtonLED3Pin = 52;
 const int YellowButtonLED4Pin = 53;
 
 
-/* Integers */
+
+/* Variables */
+//Integers
 int TempLEDRedPWM; //int set integers (whole numbers) which can be masked for PWM outs and ADC reads.
 int TempLEDGreenPWM;
 int TempLEDBluePWM;
-
-
-/* Floats */
+//Floats
 float T1Temp; //T1Temp is heat exchanger, store as float T1Temp //note that floats must be used in equations as dividing integers will cause errors as they 
               //cannot have decimal points.
 float T2Temp; //T2Temp is bath, store as float T2Temp // e.g. 7/2 is 3.5 but this will not work with integer notation
@@ -105,12 +105,53 @@ void setup()
 {
 /* Set the pins. */
 
-  pinMode(GreenLEDPin, OUTPUT);
-  pinMode(RedLEDPin, OUTPUT);
+  //PWM Pins
+  pinMode(HeatPWMPin, OUTPUT);
+  pinMode(FanPWMPin, OUTPUT);
+  pinMode(PeltierLPWMPin, OUTPUT);
+  pinMode(PeltierRPWMPin, OUTPUT);
   pinMode(TempLEDRedPin, OUTPUT);
   pinMode(TempLEDGreenPin, OUTPUT);
   pinMode(TempLEDBluePin, OUTPUT);
+  //LCD Pins
+  pinMode(LCDRS, OUTPUT);
+  pinMode(LCDRW, OUTPUT);
+  pinMode(LCDEnable, OUTPUT);
+  pinMode(LCDD4, OUTPUT);
+  pinMode(LCDD5, OUTPUT);
+  pinMode(LCDD6, OUTPUT);
+  pinMode(LCDD7, OUTPUT);
+  //Button Signals
+  pinMode(GreenButtonSignalPin, INPUT);
+  pinMode(RedButtonSignalPin, INPUT);
+  pinMode(YellowButtonSignal1Pin, INPUT);
+  pinMode(YellowButtonSignal2Pin, INPUT);
+  pinMode(YellowButtonSignal3Pin, INPUT);
+  pinMode(YellowButtonSignal4Pin, INPUT);
+  //Peltier Enable Signals
+  pinMode(PeltierLEnablePin, OUTPUT);
+  pinMode(PeltierREnablePin, OUTPUT);
 
+
+  
+  //LED Pins//
+  pinMode(RedLEDPin, OUTPUT);
+  pinMode(GreenLEDPin, OUTPUT);
+  pinMode(YellowLEDPin, OUTPUT);
+  //Button LED Pins
+  pinMode(GreenButtonLEDPin, OUTPUT);
+  pinMode(RedButtonLEDPin, OUTPUT);
+  pinMode(YellowButtonLED1Pin, OUTPUT);
+  pinMode(YellowButtonLED2Pin, OUTPUT);
+  pinMode(YellowButtonLED3Pin, OUTPUT);
+  pinMode(YellowButtonLED4Pin, OUTPUT);
+
+
+
+
+
+
+/*Set LEDs etc on for setup profile*/
   digitalWrite(GreenLEDPin, LOW);
   digitalWrite(RedLEDPin, HIGH);
 
