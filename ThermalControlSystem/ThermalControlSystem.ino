@@ -99,11 +99,11 @@ LiquidCrystal lcd(LCDRS, LCDRW, LCDEnable, LCDD4, LCDD5, LCDD6, LCDD7); //set th
 Adafruit_MCP9600 mcp1; //define mcp1 as an adafruit mcp9600 module
 Adafruit_MCP9600 mcp2; //define mcp2 as an adafruit mcp9600 module
 #define TC1_Address (0x67) //thermcouple 1 is the normal adafruit mcp9600 board I2C address (0x67)
-#define TC2_Address (0X66) // thermcouple 2 is has solder bridge across first addr pannels giving 0x66 I2C address
+#define TC2_Address (0X66) // thermcouple 2 is has solder bridge across first addr pannel giving 0x66 I2C address
 
 void setup()
 {
-/* Set the pins. */
+/* Set the pin modes. */
 
   //PWM Pins
   pinMode(HeatPWMPin, OUTPUT);
@@ -131,9 +131,6 @@ void setup()
   //Peltier Enable Signals
   pinMode(PeltierLEnablePin, OUTPUT);
   pinMode(PeltierREnablePin, OUTPUT);
-
-
-  
   //LED Pins//
   pinMode(RedLEDPin, OUTPUT);
   pinMode(GreenLEDPin, OUTPUT);
