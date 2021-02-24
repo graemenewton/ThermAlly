@@ -31,7 +31,7 @@
 
 /* Analog Pins */
 const int PotPin1 = A0; //10 turn potentiometer
-const int PotPin2 = A1; //3 turn potentiometer
+const int PotPin2 = A1; //3 turn potentiometer 
 
 
 /* Digital Pins */
@@ -94,7 +94,7 @@ LiquidCrystal(rs, rw, enable, d4, d5, d6, d7) <------------- this one used
 LiquidCrystal(rs, enable, d0, d1, d2, d3, d4, d5, d6, d7)
 LiquidCrystal(rs, rw, enable, d0, d1, d2, d3, d4, d5, d6, d7) */
 
-LiquidCrystal lcd(31, 29, 33, 27, 25, 23, 22); //set the LCD pins (as described in above pin map)
+LiquidCrystal lcd(LCDRS, LCDRW, LCDEnable, LCDD4, LCDD5, LCDD6, LCDD7); //set the LCD pins (as described in above pin map)
 
 Adafruit_MCP9600 mcp1; //define mcp1 as an adafruit mcp9600 module
 Adafruit_MCP9600 mcp2; //define mcp2 as an adafruit mcp9600 module
