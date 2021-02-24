@@ -82,6 +82,7 @@ const int YellowButtonLED4Pin = 53;
 int TempLEDRedPWM; //int set integers (whole numbers) which can be masked for PWM outs and ADC reads.
 int TempLEDGreenPWM;
 int TempLEDBluePWM;
+int LEDBrightness;
 //Floats
 float T1Temp; //T1Temp is heat exchanger, store as float T1Temp //note that floats must be used in equations as dividing integers will cause errors as they 
               //cannot have decimal points.
@@ -104,6 +105,9 @@ Adafruit_MCP9600 mcp2; //define mcp2 as an adafruit mcp9600 module
 void setup()
 {
 /* Set the pin modes. */
+  pinMode(PotPin1, INPUT); //10 turn potentiometer
+  pinMode(PotPin2, INPUT); //3 turn potentiometer 
+
 
   //PWM Pins
   pinMode(HeatPWMPin, OUTPUT);
@@ -143,23 +147,19 @@ void setup()
   pinMode(YellowButtonLED3Pin, OUTPUT);
   pinMode(YellowButtonLED4Pin, OUTPUT);
 
-
-
-
-
-
 /*Set LEDs etc on for setup profile*/
-  digitalWrite(GreenLEDPin, LOW);
   digitalWrite(RedLEDPin, HIGH);
+  digitalWrite(GreenLEDPin, LOW);
+  digitalWrite(YellowLEDPin, LOW);
+  
 
 /* Print startup message to LCD. */
-
   lcd.begin(20, 4); //begin LCD communication, device has 20 coloumbs and 4 rows
   lcd.setCursor(0,1);
   lcd.print("  Thermal Control");
   lcd.setCursor(0,2);
   lcd.print("System Initialising");
-  delay(3000);
+  delay(2000);
 
 /* Begin serial communication at 115200 baud */
 
@@ -176,7 +176,7 @@ void setup()
   lcd.print("      Checking      ");
   lcd.setCursor(0, 2); //set to start at lower middle left
   lcd.print("    Thermocouples   ");
-  delay(3000); //wait for 2 secs before starting new command to allow message to be on screen for long enough for user
+  delay(2000); //wait for 2 secs before starting new command to allow message to be on screen for long enough for user
   lcd.clear(); //clear lcd
 
 /* Initialise the driver with I2C_ADDRESS and the default I2C bus for TC1. */
@@ -202,7 +202,7 @@ void setup()
   lcd.print("       Found       ");
   lcd.setCursor(0, 2);
   lcd.print("  Thermocouple 1!");
-  delay(3000); //wait 2 secs to allow user to read
+  delay(2000); //wait 2 secs to allow user to read
   lcd.clear();
   delay(500);
 
@@ -228,7 +228,7 @@ void setup()
   lcd.print("       Found       ");
   lcd.setCursor(0, 2);
   lcd.print("  Thermocouple 2!");
-  delay(3000); //wait 2 secs to allow user to read
+  delay(2000); //wait 2 secs to allow user to read
   lcd.clear();
   delay(500);
 
@@ -347,7 +347,7 @@ void setup()
     case MCP9600_ADCRESOLUTION_12:   lcd.print("12"); break;
   }
   lcd.print(".");
-  delay(10000); //wait to allow user to read
+  delay(5000); //wait to allow user to read
   lcd.clear();
 
 /* Code can be added here to set alerts. These can be used for safety features such as to shut off in the case of overheating. */
@@ -393,19 +393,18 @@ TCLCDPrint(); //uses custom function to print Theromcouple parameters to LCD dis
 
 
 /* Store temperatures for T1 and T2 as variables */
-
   T1Temp = mcp1.readThermocouple(); //T1Temp is heat exchanger, store as float T1Temp
   T2Temp = mcp2.readThermocouple(); //T2Temp is bath, store as float T2Temp
 
 /* Code below regultes the RGB PWM numbers for the RGB LED - this is used so operators can guage the temperature based on LED colour from a distance 
 without having to get close to the screen. */
-
 LEDTempColour(); //custom function for assigning PWM integers based on bath temperature for LED colouring, function defined in LEDTempColour.ino Tab
+LEDBrightness = (4095-analogRead(A1)); //99 
   
 //use PWM numbers set above to control colour of RGB LED.
-  analogWrite(TempLEDRedPin, map(TempLEDRedPWM, 0, 255, 0, 4095));
-  analogWrite(TempLEDGreenPin, map(TempLEDGreenPWM, 0, 255, 0, 4095));
-  analogWrite(TempLEDBluePin, map(TempLEDBluePWM, 0, 255, 0, 4095));
+  analogWrite(TempLEDRedPin, (map(TempLEDRedPWM, 0, 255, 0, 4095)/map(LEDBrightness, 0, 4095, 1, 10)));
+  analogWrite(TempLEDGreenPin, (map(TempLEDGreenPWM, 0, 255, 0, 4095)/map(LEDBrightness, 0, 4095, 1, 10)));
+  analogWrite(TempLEDBluePin, (map(TempLEDBluePWM, 0, 255, 0, 4095)/map(LEDBrightness, 0, 4095, 1, 10)));
 
   delay(100); //repeat this every 100ms
   
