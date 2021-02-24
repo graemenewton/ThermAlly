@@ -32,21 +32,7 @@
 /* Digital Pins */
 //const int sets constant integers, such as pin numbers.
 
-//LCD
-
-
-//LEDs
-const int RedLEDPin = 45;
-const int GreenLEDPin = 46; 
-const int YellowLEDPin = 47;
-//Button LEDs
-const int YellowButtonLED1 = 50;
-const int YellowButtonLED2 = 51;
-const int YellowButtonLED3 = 52;
-const int YellowButtonLED4 = 53;
-
-
-/* PWM Pins */
+//PWM Pins 
 const int HeatPWMPin = 2;
 const int FanPWMPin = 3;
 const int PeltierLPWMPin = 4;
@@ -54,6 +40,35 @@ const int PeltierRPWMPin = 5;
 const int TempLEDRedPin = 6;
 const int TempLEDGreenPin = 7;
 const int TempLEDBluePin = 8;
+//LCD
+const int LCDRS = 22;
+const int LCDRW= 23;
+const int LCDEnable = 24;
+const int LCDD4 = 25;
+const int LCDD5 = 26;
+const int LCDD6 = 27;
+const int LCDD7 = 28;
+//Button Signals
+const int GreenButtonSignal = 30;
+const int RedButtonSignal = 31;
+const int YellowButtonSignal1 = 32;
+const int YellowButtonSignal2 = 33;
+const int YellowButtonSignal3 = 34;
+const int YellowButtonSignal4 = 35;
+//Peltier Enable Signals
+const int PeltierLEnable = 36;
+const int PeltierREnable = 37;
+//LEDs
+const int RedLEDPin = 45;
+const int GreenLEDPin = 46; 
+const int YellowLEDPin = 47;
+//Button LEDs
+const int GreenButtonLED = 48;
+const int RedButtonLED = 49;
+const int YellowButtonLED1 = 50;
+const int YellowButtonLED2 = 51;
+const int YellowButtonLED3 = 52;
+const int YellowButtonLED4 = 53;
 
 
 /* Integers */
