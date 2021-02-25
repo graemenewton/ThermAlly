@@ -406,6 +406,9 @@ LEDBrightness = (4095-analogRead(A1)); //99
   analogWrite(TempLEDGreenPin, (map(TempLEDGreenPWM, 0, 255, 0, 4095)/map(LEDBrightness, 0, 4095, 1, 10)));
   analogWrite(TempLEDBluePin, (map(TempLEDBluePWM, 0, 255, 0, 4095)/map(LEDBrightness, 0, 4095, 1, 10)));
 
+  analogWrite(FanPWMPin, 4095);
+
+  delay(1000);
   analogWrite(FanPWMPin, 0);
 
   delay(100); //repeat this every 100ms
