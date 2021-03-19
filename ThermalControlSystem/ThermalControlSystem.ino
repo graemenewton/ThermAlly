@@ -83,11 +83,16 @@ int TempLEDRedPWM; //int set integers (whole numbers) which can be masked for PW
 int TempLEDGreenPWM;
 int TempLEDBluePWM;
 int LEDBrightness;
+
 //Floats
 float T1Temp; //T1Temp is heat exchanger, store as float T1Temp //note that floats must be used in equations as dividing integers will cause errors as they 
               //cannot have decimal points.
 float T2Temp; //T2Temp is bath, store as float T2Temp // e.g. 7/2 is 3.5 but this will not work with integer notation
 
+float BaselineTemp = 32.0;
+float TargetTemp = 32.0;
+float TargetTempMin = ;
+float TargetTempMax = ;
 
 /* Syntax for LCD pin numbers:
 LiquidCrystal(rs, enable, d4, d5, d6, d7)
@@ -406,10 +411,15 @@ LEDBrightness = (4095-analogRead(A1)); //99
   analogWrite(TempLEDGreenPin, (map(TempLEDGreenPWM, 0, 255, 0, 4095)/map(LEDBrightness, 0, 4095, 1, 10)));
   analogWrite(TempLEDBluePin, (map(TempLEDBluePWM, 0, 255, 0, 4095)/map(LEDBrightness, 0, 4095, 1, 10)));
 
-  analogWrite(FanPWMPin, 4095);
+if YellowButtonSignalPin1 = HIGH
+delay(1) while 
 
-  delay(1000);
-  analogWrite(FanPWMPin, 0);
+const int GreenButtonSignalPin = 30;
+const int RedButtonSignalPin = 31;
+const int YellowButtonSignal1Pin = 32;
+const int YellowButtonSignal2Pin = 33;
+const int YellowButtonSignal3Pin = 34;
+const int YellowButtonSignal4Pin = 35;
 
   delay(100); //repeat this every 100ms
   
