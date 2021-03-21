@@ -26,7 +26,7 @@
 #include <Wire.h> //This library allows you to communicate with I2C / TWI devices
 #include <Adafruit_I2CDevice.h> //
 #include <Adafruit_I2CRegister.h>
-#include <Adafruit_MCP9600.h> //delete this if works, changes "" at ends <>.
+#include <Adafruit_MCP9600.h> 
 #include <LiquidCrystal.h> //allows for easy interfacing with LCD display using digital pins. Requires no I2C adapter.
 
 /* Analog Pins */
@@ -91,8 +91,8 @@ float T2Temp; //T2Temp is bath, store as float T2Temp // e.g. 7/2 is 3.5 but thi
 
 float BaselineTemp = 32.0;
 float TargetTemp = 32.0;
-float TargetTempMin = ;
-float TargetTempMax = ;
+float TargetTempMin;
+float TargetTempMax;
 
 /* Syntax for LCD pin numbers:
 LiquidCrystal(rs, enable, d4, d5, d6, d7)
@@ -109,6 +109,8 @@ Adafruit_MCP9600 mcp2; //define mcp2 as an adafruit mcp9600 module
 
 void setup()
 {
+
+
 /* Set the pin modes. */
   pinMode(PotPin1, INPUT); //10 turn potentiometer
   pinMode(PotPin2, INPUT); //3 turn potentiometer 
@@ -411,16 +413,24 @@ LEDBrightness = (4095-analogRead(A1)); //99
   analogWrite(TempLEDGreenPin, (map(TempLEDGreenPWM, 0, 255, 0, 4095)/map(LEDBrightness, 0, 4095, 1, 10)));
   analogWrite(TempLEDBluePin, (map(TempLEDBluePWM, 0, 255, 0, 4095)/map(LEDBrightness, 0, 4095, 1, 10)));
 
-if YellowButtonSignalPin1 = HIGH
-delay(1) while 
 
-const int GreenButtonSignalPin = 30;
-const int RedButtonSignalPin = 31;
-const int YellowButtonSignal1Pin = 32;
-const int YellowButtonSignal2Pin = 33;
-const int YellowButtonSignal3Pin = 34;
-const int YellowButtonSignal4Pin = 35;
 
   delay(100); //repeat this every 100ms
   
+}
+
+
+void buttonLoop()
+{
+  if (YellowButtonSignal1Pin == HIGH)
+  {
+    
+  }
+YellowButtonSignal2Pin;
+YellowButtonSignal3Pin;
+YellowButtonSignal4Pin;
+  
+GreenButtonSignalPin;
+RedButtonSignalPin;
+  delay(10);
 }
