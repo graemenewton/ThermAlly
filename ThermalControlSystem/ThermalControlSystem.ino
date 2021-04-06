@@ -26,7 +26,8 @@
 #include <Wire.h> //This library allows you to communicate with I2C / TWI devices
 #include <Adafruit_I2CDevice.h> //
 #include <Adafruit_I2CRegister.h>
-#include <Adafruit_MCP9600.h> 
+#include <Adafruit_MCP4725.h> //include the repository for the DAC
+#include <Adafruit_MCP9600.h> //include the repository for the thermocuple amplifiers
 #include <LiquidCrystal.h> //allows for easy interfacing with LCD display using digital pins. Requires no I2C adapter.
 
 /* Analog Pins */
@@ -105,7 +106,10 @@ LiquidCrystal lcd(LCDRS, LCDRW, LCDEnable, LCDD4, LCDD5, LCDD6, LCDD7); //set th
 Adafruit_MCP9600 mcp1; //define mcp1 as an adafruit mcp9600 module
 Adafruit_MCP9600 mcp2; //define mcp2 as an adafruit mcp9600 module
 #define TC1_Address (0x67) //thermcouple 1 is the normal adafruit mcp9600 board I2C address (0x67)
-#define TC2_Address (0X66) // thermcouple 2 is has solder bridge across first addr pannel giving 0x66 I2C address
+#define TC2_Address (0X66) //thermcouple 2 is has solder bridge across first addr pannel giving 0x66 I2C address
+
+Adafruit_MCP4725 dac; //define dac as an mcp4725 module
+
 
 void setup()
 {
@@ -386,6 +390,9 @@ void setup()
   analogWriteResolution(12); //12 bits is maximum resolution which can be run on the Arduino Due, this command will unlock the best possible DAC/PWM resolution for us.
   // analogWrite() is 8 bits by default (0-255), changing this means it will now be 0-4095. analogRead() is 10 bits (0-1023) by default, chaning this means it
   // would now be 0-4095. The map() function is useful here, e.g. map(sensorVal, 0, 1023, 0, 4095) - this would essentially scale 10 bits to 12 bits.
+
+
+dac.begin(0x63); //begin communications with the MCP4725 dac module at I2C address 0x62
  
   
 }
