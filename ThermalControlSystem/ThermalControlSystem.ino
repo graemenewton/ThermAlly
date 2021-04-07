@@ -95,8 +95,11 @@ float TargetTemp = 32.0;
 float TargetTempMin;
 float TargetTempMax;
 
-unsigned long PreviousTime;
-unsigned long CurrentTime;
+unsigned long CurrentTime = 0;
+unsigned long PreviousDisplayTime = 0;
+unsigned long DisplayInterval = 100;
+unsigned long PreviousLEDTime = 0;
+unsigned long LEDInterval = 100;
 
 /* Syntax for LCD pin numbers:
 LiquidCrystal(rs, enable, d4, d5, d6, d7)
@@ -403,16 +406,23 @@ dac.begin(0x63); //begin communications with the MCP4725 dac module at I2C addre
 
 void loop()
 {
+CurrentTime = millis(); //store the millis() value as the current time
 
+if (CurrentTime - PreviousDisplayTime > DisplayInterval) // display interval is 100ms, so: if 100ms has passed, then the lcd and serial monitors will print info
+{
+  PreviousDisplayTime = CurrentTime; //update the previous display time with the current time
 TCSerialPrint(); //uses custom function to print Theromcouple paramaters to Serial port. See TCSerialPrint.ino tab
-
 TCLCDPrint(); //uses custom function to print Theromcouple parameters to LCD display. See TCLCDPrint.ino tab
-
+}
 
 /* Store temperatures for T1 and T2 as variables */
   T1Temp = mcp1.readThermocouple(); //T1Temp is heat exchanger, store as float T1Temp
   T2Temp = mcp2.readThermocouple(); //T2Temp is bath, store as float T2Temp
 
+if (CurrentTime - PreviousLEDTime > LEDInterval) // LED interval is 100ms. so if 100ms pass, then update the LED Colour
+{
+  PreviousLEDTime = CurrentTime; //update the previous LED time with the current time
+  
 /* Code below regultes the RGB PWM numbers for the RGB LED - this is used so operators can guage the temperature based on LED colour from a distance 
 without having to get close to the screen. */
 LEDTempColour(); //custom function for assigning PWM integers based on bath temperature for LED colouring, function defined in LEDTempColour.ino Tab
@@ -422,25 +432,8 @@ LEDBrightness = (4095-analogRead(A1)); //99
   analogWrite(TempLEDRedPin, (map(TempLEDRedPWM, 0, 255, 0, 4095)/map(LEDBrightness, 0, 4095, 1, 10)));
   analogWrite(TempLEDGreenPin, (map(TempLEDGreenPWM, 0, 255, 0, 4095)/map(LEDBrightness, 0, 4095, 1, 10)));
   analogWrite(TempLEDBluePin, (map(TempLEDBluePWM, 0, 255, 0, 4095)/map(LEDBrightness, 0, 4095, 1, 10)));
-
-
-
-  delay(100); //repeat this every 100ms
-  
 }
 
 
-void buttonLoop()
-{
-  if (YellowButtonSignal1Pin == HIGH)
-  {
-    
-  }
-YellowButtonSignal2Pin;
-YellowButtonSignal3Pin;
-YellowButtonSignal4Pin;
   
-GreenButtonSignalPin;
-RedButtonSignalPin;
-  delay(10);
 }
