@@ -95,6 +95,9 @@ float TargetTemp = 32.0;
 float TargetTempMin;
 float TargetTempMax;
 
+unsigned long PreviousTime;
+unsigned long CurrentTime;
+
 /* Syntax for LCD pin numbers:
 LiquidCrystal(rs, enable, d4, d5, d6, d7)
 LiquidCrystal(rs, rw, enable, d4, d5, d6, d7) <------------- this one used
