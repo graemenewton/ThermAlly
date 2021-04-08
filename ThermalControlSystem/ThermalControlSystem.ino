@@ -399,28 +399,33 @@ void setup()
   // analogWrite() is 8 bits by default (0-255), changing this means it will now be 0-4095. analogRead() is 10 bits (0-1023) by default, chaning this means it
   // would now be 0-4095. The map() function is useful here, e.g. map(sensorVal, 0, 1023, 0, 4095) - this would essentially scale 10 bits to 12 bits.
 
-/* Code for picking the baseline temperature */
+  /* Code for picking the baseline temperature */
 
-if (digitalRead(GreenButtonSignalPin) == 0)
-{
-GreenButtonSwitchState = digitalRead(GreenButtonSignalPin);
+  GreenButtonSwitchState = digitalRead(GreenButtonSignalPin);
 
-while (GreenButtonSwitchState == 0)
-{
-BaselineTemp = map(analogRead(PotPin1), 0, 4095, 0 , 50);
-lcd.clear();
-lcd.setCursor(0, 0);
-lcd.print(" Select Baseline ");
-lcd.setCursor(0, 1);
-lcd.print("    Temperature:   ");
-lcd.setCursor(0, 2);
-lcd.print("     "), lcd.print(BaselineTemp);
+  while (GreenButtonSwitchState == 0)
+  {
+    BaselineTemp = map(analogRead(PotPin1), 0, 4095, 0 , 50);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Baseline Temperature");
+    lcd.setCursor(0, 1);
+    lcd.print("     "), lcd.print(BaselineTemp);
+    lcd.setCursor(0, 2);
+    lcd.print(" Press Green Button");
+    lcd.setCursor(0, 3);
+    lcd.print("     To Confirm     ");
+    delay(20);
+  }
 
-delay(100);
-}
-
-}
-
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Baseline Temperature");
+  lcd.setCursor(0, 1);
+  lcd.print("      Selected      ");
+  lcd.setCursor(0, 2);
+  lcd.print("     "), lcd.print(BaselineTemp);
+  delay(2000);
 
 
 
@@ -432,11 +437,11 @@ delay(100);
 
 void loop()
 {
-  
+
   CurrentTime = millis(); //store the millis() value as the current time
 
 
-/* Display refresh*/
+  /* Display refresh*/
   if (CurrentTime - PreviousDisplayTime > DisplayInterval) // display interval is 100ms, so: if 100ms has passed, then the lcd and serial monitors will print info
   {
     PreviousDisplayTime = CurrentTime; //update the previous display time with the current time
