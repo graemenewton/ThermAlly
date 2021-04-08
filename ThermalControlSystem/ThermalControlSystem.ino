@@ -84,6 +84,8 @@ int TempLEDRedPWM; //int set integers (whole numbers) which can be masked for PW
 int TempLEDGreenPWM;
 int TempLEDBluePWM;
 int LEDBrightness;
+int GreenButtonSwitchState;
+
 
 //Floats
 float T1Temp; //T1Temp is heat exchanger, store as float T1Temp //note that floats must be used in equations as dividing integers will cause errors as they
@@ -397,6 +399,30 @@ void setup()
   // analogWrite() is 8 bits by default (0-255), changing this means it will now be 0-4095. analogRead() is 10 bits (0-1023) by default, chaning this means it
   // would now be 0-4095. The map() function is useful here, e.g. map(sensorVal, 0, 1023, 0, 4095) - this would essentially scale 10 bits to 12 bits.
 
+/* Code for picking the baseline temperature */
+
+if (digitalRead(GreenButtonSignalPin) == 0)
+{
+GreenButtonSwitchState = digitalRead(GreenButtonSignalPin);
+
+while (GreenButtonSwitchState == 0)
+{
+BaselineTemp = map(analogRead(PotPin1), 0, 4095, 0 , 50);
+lcd.clear();
+lcd.setCursor(0, 0);
+lcd.print(" Select Baseline ");
+lcd.setCursor(0, 1);
+lcd.print("    Temperature:   ");
+lcd.setCursor(0, 2);
+lcd.print("     "), lcd.print(BaselineTemp);
+
+delay(100);
+}
+
+}
+
+
+
 
   dac.begin(0x63); //begin communications with the MCP4725 dac module at I2C address 0x62
 
@@ -409,6 +435,8 @@ void loop()
   
   CurrentTime = millis(); //store the millis() value as the current time
 
+
+/* Display refresh*/
   if (CurrentTime - PreviousDisplayTime > DisplayInterval) // display interval is 100ms, so: if 100ms has passed, then the lcd and serial monitors will print info
   {
     PreviousDisplayTime = CurrentTime; //update the previous display time with the current time
@@ -420,6 +448,9 @@ void loop()
   T1Temp = mcp1.readThermocouple(); //T1Temp is heat exchanger, store as float T1Temp
   T2Temp = mcp2.readThermocouple(); //T2Temp is bath, store as float T2Temp
 
+
+
+
   if (CurrentTime - PreviousLEDTime > LEDInterval) // LED interval is 100ms. so if 100ms pass, then update the LED Colour
   {
     PreviousLEDTime = CurrentTime; //update the previous LED time with the current time
@@ -427,7 +458,7 @@ void loop()
     /* Code below regultes the RGB PWM numbers for the RGB LED - this is used so operators can guage the temperature based on LED colour from a distance
       without having to get close to the screen. */
     LEDTempColour(); //custom function for assigning PWM integers based on bath temperature for LED colouring, function defined in LEDTempColour.ino Tab
-    LEDBrightness = (4095 - analogRead(A1)); //99
+    LEDBrightness = (4095 - analogRead(PotPin2)); //99
 
     //use PWM numbers set above to control colour of RGB LED.
     analogWrite(TempLEDRedPin, (map(TempLEDRedPWM, 0, 255, 0, 4095) / map(LEDBrightness, 0, 4095, 1, 10)));
