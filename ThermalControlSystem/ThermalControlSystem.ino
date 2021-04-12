@@ -105,7 +105,7 @@ unsigned long DisplayInterval = 100;
 unsigned long PreviousLEDTime = 0;
 unsigned long LEDInterval = 100;
 unsigned long PreviousHeatTime = 0;
-unsigned long HeatInterval = 20;
+unsigned long HeatInterval = 10;
 unsigned long PreviousDACTime = 0;
 unsigned long DACInterval = 1;
 
@@ -460,13 +460,7 @@ void loop()
     TCLCDPrint(); //uses custom function to print Theromcouple parameters to LCD display. See TCLCDPrint.ino tab
   }
 
-  /* Store temperatures for T1 and T2 as variables */
-  T1Temp = mcp1.readThermocouple(); //T1Temp is heat exchanger, store as float T1Temp
-  T2Temp = mcp2.readThermocouple(); //T2Temp is bath, store as float T2Temp
-
-
-
-
+  /* Temperature LED  */
   if (CurrentTime - PreviousLEDTime > LEDInterval) // LED interval is 100ms. so if 100ms pass, then update the LED Colour
   {
     PreviousLEDTime = CurrentTime; //update the previous LED time with the current time
@@ -483,12 +477,17 @@ void loop()
   }
 
 
+/* Store temperatures for T1 and T2 as variables */
+  T1Temp = mcp1.readThermocouple(); //T1Temp is heat exchanger, store as float T1Temp
+  T2Temp = mcp2.readThermocouple(); //T2Temp is bath, store as float T2Temp
+
+ /* DAC Output Temperature  */
   if (CurrentTime - PreviousDACTime > DACInterval) //DAC Interval is 1ms, aka 1000Hz
   {
 
   }
 
-  if (CurrentTime - PreviousHeatTime > HeatInterval) // Heat interval is 20ms. so if 20ms pass, check the temperatures and heat accordingly
+  if (CurrentTime - PreviousHeatTime > HeatInterval) // Heat interval is 10ms. so if 20ms pass, check the temperatures and heat accordingly
   {
 
   }
