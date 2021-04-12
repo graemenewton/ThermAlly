@@ -84,6 +84,8 @@ int TempLEDRedPWM; //int set integers (whole numbers) which can be masked for PW
 int TempLEDGreenPWM;
 int TempLEDBluePWM;
 int LEDBrightness;
+int BaselineTempInteger;
+int BaselineTempState = 0;
 int GreenButtonSwitchState;
 
 
@@ -401,21 +403,26 @@ void setup()
 
   /* Code for picking the baseline temperature */
 
-  GreenButtonSwitchState = digitalRead(GreenButtonSignalPin);
+  digitalWrite(GreenButtonLEDPin, HIGH);
 
-  while (GreenButtonSwitchState == 0)
+  while (BaselineTempState == 0)
   {
-    BaselineTemp = map(analogRead(PotPin1), 0, 4095, 0 , 50);
+    BaselineTempInteger = map(analogRead(PotPin1), 0, 4095, 0 , 5000);
+    BaselineTemp = (float)BaselineTempInteger / 100;
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Baseline Temperature");
     lcd.setCursor(0, 1);
-    lcd.print("     "), lcd.print(BaselineTemp);
+    lcd.print("        "), lcd.print(BaselineTemp);
     lcd.setCursor(0, 2);
     lcd.print(" Press Green Button");
     lcd.setCursor(0, 3);
     lcd.print("     To Confirm     ");
-    delay(20);
+    if (digitalRead(GreenButtonSignalPin) == HIGH)
+    {
+      BaselineTempState = 1;
+    }
+    delay(100);
   }
 
   lcd.clear();
@@ -424,7 +431,7 @@ void setup()
   lcd.setCursor(0, 1);
   lcd.print("      Selected      ");
   lcd.setCursor(0, 2);
-  lcd.print("     "), lcd.print(BaselineTemp);
+  lcd.print("        "), lcd.print(BaselineTemp);
   delay(2000);
 
 
