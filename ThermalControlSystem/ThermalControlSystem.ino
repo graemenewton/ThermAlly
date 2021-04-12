@@ -477,11 +477,11 @@ void loop()
   }
 
 
-/* Store temperatures for T1 and T2 as variables */
+  /* Store temperatures for T1 and T2 as variables */
   T1Temp = mcp1.readThermocouple(); //T1Temp is heat exchanger, store as float T1Temp
   T2Temp = mcp2.readThermocouple(); //T2Temp is bath, store as float T2Temp
 
- /* DAC Output Temperature  */
+  /* DAC Output Temperature  */
   if (CurrentTime - PreviousDACTime > DACInterval) //DAC Interval is 1ms, aka 1000Hz
   {
 
