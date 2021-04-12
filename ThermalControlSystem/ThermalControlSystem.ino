@@ -403,13 +403,13 @@ void setup()
 
   /* Code for picking the baseline temperature */
 
-  digitalWrite(GreenButtonLEDPin, HIGH);
+  digitalWrite(GreenButtonLEDPin, HIGH); //turn gren button LED on
 
-  while (BaselineTempState == 0)
+  while (BaselineTempState == 0) //while the baselinetemp has not been set do the following:
   {
-    BaselineTempInteger = map(analogRead(PotPin1), 0, 4095, 0 , 5000);
-    BaselineTemp = (float)BaselineTempInteger / 100;
-    lcd.clear();
+    BaselineTempInteger = map(analogRead(PotPin1), 0, 4095, 0 , 5000); //map the 10-turn potentiometer to 0-50 degrees C
+    BaselineTemp = (float)BaselineTempInteger / 100; //pass BaselineTempInteger as a float so it can be divided into non whole numbers and store float as BaselineTemp
+    lcd.clear(); //clear the LCD and print the baseline temperature annotation
     lcd.setCursor(0, 0);
     lcd.print("Baseline Temperature");
     lcd.setCursor(0, 1);
@@ -418,9 +418,9 @@ void setup()
     lcd.print(" Press Green Button");
     lcd.setCursor(0, 3);
     lcd.print("     To Confirm     ");
-    if (digitalRead(GreenButtonSignalPin) == HIGH)
+    if (digitalRead(GreenButtonSignalPin) == HIGH) //if the green button is pressed then:
     {
-      BaselineTempState = 1;
+      BaselineTempState = 1; //make the state of the baseline temperature 1, marking it as chosen, and exit the while() loop
     }
     delay(100);
   }
