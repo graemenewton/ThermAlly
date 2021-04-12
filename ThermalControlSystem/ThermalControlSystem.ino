@@ -104,6 +104,10 @@ unsigned long PreviousDisplayTime = 0;
 unsigned long DisplayInterval = 100;
 unsigned long PreviousLEDTime = 0;
 unsigned long LEDInterval = 100;
+unsigned long PreviousHeatTime = 0;
+unsigned long HeatInterval = 20;
+unsigned long PreviousDACTime = 0;
+unsigned long DACInterval = 1;
 
 /* Syntax for LCD pin numbers:
   LiquidCrystal(rs, enable, d4, d5, d6, d7)
@@ -478,6 +482,16 @@ void loop()
     analogWrite(TempLEDBluePin, (map(TempLEDBluePWM, 0, 255, 0, 4095) / map(LEDBrightness, 0, 4095, 1, 10)));
   }
 
+
+  if (CurrentTime - PreviousDACTime > DACInterval) //DAC Interval is 1ms, aka 1000Hz
+  {
+
+  }
+
+  if (CurrentTime - PreviousHeatTime > HeatInterval) // Heat interval is 20ms. so if 20ms pass, check the temperatures and heat accordingly
+  {
+
+  }
 
 
 }
