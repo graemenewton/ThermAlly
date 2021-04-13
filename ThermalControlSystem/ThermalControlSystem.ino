@@ -87,17 +87,21 @@ int LEDBrightness;
 int BaselineTempInteger;
 int BaselineTempState = 0;
 int GreenButtonSwitchState;
+int DACTempOutput;
 
 
 //Floats
 float T1Temp; //T1Temp is heat exchanger, store as float T1Temp //note that floats must be used in equations as dividing integers will cause errors as they
 //cannot have decimal points.
 float T2Temp; //T2Temp is bath, store as float T2Temp // e.g. 7/2 is 3.5 but this will not work with integer notation
+float TempVoltage;
+float DACTempVoltage;
 
 float BaselineTemp = 32.0;
 float TargetTemp = 32.0;
 float TargetTempMin;
 float TargetTempMax;
+
 
 unsigned long CurrentTime = 0;
 unsigned long PreviousDisplayTime = 0;
@@ -484,9 +488,13 @@ void loop()
   /* DAC Output Temperature  */
   if (CurrentTime - PreviousDACTime > DACInterval) //DAC Interval is 1ms, aka 1000Hz
   {
-
+    TempVoltage = (mcp.readADC() * 2); //read ADC value, store as TempVoltage float. raw ADC is multiplied by 2 as it is in 18-bit mode, the units are in uV
+    DACTempVoltage = (4096 / 3.3 * (TempVoltage * pow(10, 6))); // 12 bit resolution, max of 3.3V as that is Vcc. TempVoltagex10^6 to convert from uV to V.
+    DACTempOutput = ((int)DACTempOutputVoltage); //pass the DACTempVoltage float as an integer andon 12 bit scale (0-4095) to set the DAC voltage
+    dac.setVoltage(DACTempOutput, false); //false means the value is not saved to DAC I2C board EEPROM
   }
 
+  /* Heating Element  */
   if (CurrentTime - PreviousHeatTime > HeatInterval) // Heat interval is 10ms. so if 20ms pass, check the temperatures and heat accordingly
   {
 
