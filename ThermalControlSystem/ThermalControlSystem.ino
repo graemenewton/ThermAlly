@@ -488,9 +488,9 @@ void loop()
   /* DAC Output Temperature  */
   if (CurrentTime - PreviousDACTime > DACInterval) //DAC Interval is 1ms, aka 1000Hz
   {
-    TempVoltage = (mcp.readADC() * 2); //read ADC value, store as TempVoltage float. raw ADC is multiplied by 2 as it is in 18-bit mode, the units are in uV
+    TempVoltage = (mcp2.readADC() * 2); //read ADC value, store as TempVoltage float. raw ADC is multiplied by 2 as it is in 18-bit mode, the units are in uV
     DACTempVoltage = (4096 / 3.3 * (TempVoltage * pow(10, 6))); // 12 bit resolution, max of 3.3V as that is Vcc. TempVoltagex10^6 to convert from uV to V.
-    DACTempOutput = ((int)DACTempOutputVoltage); //pass the DACTempVoltage float as an integer andon 12 bit scale (0-4095) to set the DAC voltage
+    DACTempOutput = ((int)DACTempVoltage); //pass the DACTempVoltage float as an integer andon 12 bit scale (0-4095) to set the DAC voltage
     dac.setVoltage(DACTempOutput, false); //false means the value is not saved to DAC I2C board EEPROM
   }
 
