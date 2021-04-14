@@ -96,6 +96,7 @@ float T1Temp; //T1Temp is heat exchanger, store as float T1Temp //note that floa
 float T2Temp; //T2Temp is bath, store as float T2Temp // e.g. 7/2 is 3.5 but this will not work with integer notation
 float TempVoltage;
 float DACTempVoltage;
+float MaxDACTemp = 50.00; //max temp is 50C, this controls the DAC resolution. 0-50C will be split into a 12 bit scale (4096). Resolution of 0.012C for every number.
 
 float BaselineTemp = 32.0;
 float TargetTemp = 32.0;
@@ -489,8 +490,8 @@ void loop()
   /* DAC Output Temperature  */
   if (CurrentTime - PreviousDACTime > DACInterval) //DAC Interval is 1ms, aka 1000Hz
   {
-    TempVoltage = (mcp2.readADC() * 2); //read ADC value, store as TempVoltage float. raw ADC is multiplied by 2 as it is in 18-bit mode, the units are in uV
-    DACTempVoltage = (4096 / 3.3 * (TempVoltage * pow(10, 6))); // 12 bit resolution, max of 3.3V as that is Vcc. TempVoltagex10^6 to convert from uV to V.
+    TempVoltage = (mcp2.readThermocouple() / MaxDACTemp); //v high resolution for DAC scaling, but limited to 0-50C temp range.
+    DACTempVoltage = (TempVoltage * 4096); // 12 bit resolution, max of 3.3V as that is Vcc.
     DACTempOutput = ((int)DACTempVoltage); //pass the DACTempVoltage float as an integer andon 12 bit scale (0-4095) to set the DAC voltage
     dac.setVoltage(DACTempOutput, false); //false means the value is not saved to DAC I2C board EEPROM
   }
