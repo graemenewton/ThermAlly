@@ -430,7 +430,7 @@ void setup()
     {
       BaselineTempState = 1; //make the state of the baseline temperature 1, marking it as chosen, and exit the while() loop
     }
-    delay(100);
+    delay(100); //delay used here rather than millis() as no other loops required to run while selecting the baseline temp.
   }
 
   lcd.clear();
@@ -440,6 +440,7 @@ void setup()
   lcd.print("      Selected      ");
   lcd.setCursor(0, 2);
   lcd.print("        "), lcd.print(BaselineTemp);
+  Serial.print("Baseline Temperature Selected: "); Serial.print(BaselineTemp); Serial.println(" ºC");
   delay(2000);
 
 
