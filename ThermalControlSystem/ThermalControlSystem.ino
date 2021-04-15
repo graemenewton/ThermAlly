@@ -411,7 +411,8 @@ void setup()
   // would now be 0-4095. The map() function is useful here, e.g. map(sensorVal, 0, 1023, 0, 4095) - this would essentially scale 10 bits to 12 bits.
 
   /* Code for picking the baseline temperature */
-
+  digitalWrite(RedLEDPin, LOW);
+  digitalWrite(YellowLEDPin, HIGH);
   digitalWrite(GreenButtonLEDPin, HIGH); //turn gren button LED on
 
   while (BaselineTempState == 0) //while the baselinetemp has not been set do the following:
@@ -429,6 +430,7 @@ void setup()
     lcd.print("     To Confirm     ");
     if (digitalRead(GreenButtonSignalPin) == HIGH) //if the green button is pressed then:
     {
+      digitalWrite(GreenButtonLEDPin, LOW);
       BaselineTempState = 1; //make the state of the baseline temperature 1, marking it as chosen, and exit the while() loop
     }
     delay(100); //delay used here rather than millis() as no other loops required to run while selecting the baseline temp.
@@ -448,7 +450,12 @@ void setup()
 
   dac.begin(0x63); //begin communications with the MCP4725 dac module at I2C address 0x62
 
-
+  digitalWrite(YellowLEDPin, LOW);
+  digitalWrite(GreenLEDPin, HIGH);
+  digitalWrite(YellowButtonLED1Pin, HIGH);
+  digitalWrite(YellowButtonLED2Pin, HIGH);
+  digitalWrite(YellowButtonLED3Pin, HIGH);
+  digitalWrite(YellowButtonLED4Pin, HIGH);
 }
 
 
