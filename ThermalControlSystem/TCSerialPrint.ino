@@ -6,7 +6,6 @@
 
 void TCSerialPrint()
 {
-
   Serial.print("Hot Junction 1: "); Serial.print(mcp1.readThermocouple(), 4); Serial.println(" ºC");
   Serial.print("Cold Junction 1: "); Serial.print(mcp1.readAmbient(), 4); Serial.println(" ºC");
   Serial.print("Hot Junction 2: "); Serial.print(mcp2.readThermocouple(), 4); Serial.println(" ºC");

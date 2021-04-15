@@ -492,15 +492,36 @@ void loop()
   {
     TempVoltage = (mcp2.readThermocouple() / MaxDACTemp); //v high resolution for DAC scaling, but limited to 0-50C temp range.
     DACTempVoltage = (TempVoltage * 4096); // 12 bit resolution, max of 3.3V as that is Vcc.
-    DACTempOutput = ((int)DACTempVoltage); //pass the DACTempVoltage float as an integer andon 12 bit scale (0-4095) to set the DAC voltage
+    DACTempOutput = ((int)DACTempVoltage); //pass the DACTempVoltage float as an integer and on 12 bit scale (0-4095) to set the DAC voltage
     dac.setVoltage(DACTempOutput, false); //false means the value is not saved to DAC I2C board EEPROM
   }
 
   /* Heating Element  */
   if (CurrentTime - PreviousHeatTime > HeatInterval) // Heat interval is 10ms. so if 20ms pass, check the temperatures and heat accordingly
   {
+    if (T2Temp < TargetTempMin) // if temp is lower than minimu, heat at full power
+    {
+      analogWrite(HeatPWMPin, 4096); //100% duty cycle aka full power
+    }
+
+    else if ((T2Temp >= TargetTempMin) && (T2Temp <= TargetTemp)) //if temp is just below target temp, then heat with 75% power
+    {
+      analogWrite(HeatPWMPin, 3072); //75% duty cycle, aka 75 % power
+    }
+
+    else if ((T2Temp <= TargetTempMax) && (T2Temp >= TargetTemp))// if temp is just above target temp, then heat at 50% power
+    {
+      analogWrite(HeatPWMPin, 2048); //50% duty cycle, aka 50% power
+    }
+
+    else if (T2Temp > TargetTempMax) //if temp is above the target temp, then heat at 25% power
+    {
+      analogWrite(HeatPWMPin, 1024); //25% duty cycle, aka 25% power
+    }
 
   }
+
+
 
 
 }
