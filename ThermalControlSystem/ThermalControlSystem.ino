@@ -88,7 +88,7 @@ int BaselineTempInteger;
 int BaselineTempState = 0;
 int GreenButtonSwitchState;
 int DACTempOutput;
-int HeatSwitctState = 0;
+int HeatSwitchState = 0;
 
 
 //Floats
@@ -456,10 +456,10 @@ void setup()
   digitalWrite(RedLEDPin, LOW);
   digitalWrite(YellowLEDPin, LOW);
   digitalWrite(GreenLEDPin, HIGH);
-  digitalWrite(YellowButtonLED1Pin, HIGH);
-  digitalWrite(YellowButtonLED2Pin, HIGH);
-  digitalWrite(YellowButtonLED3Pin, HIGH);
-  digitalWrite(YellowButtonLED4Pin, HIGH);
+  digitalWrite(YellowButtonLED1Pin, LOW);
+  digitalWrite(YellowButtonLED2Pin, LOW);
+  digitalWrite(YellowButtonLED3Pin, LOW);
+  digitalWrite(YellowButtonLED4Pin, LOW);
 }
 
 
@@ -510,28 +510,40 @@ void loop()
   /* Heat On/Off Switch*/
   if (CurrentTime - PreviousHeatSwitchStateTime > HeatSwitchStateInterval) //Heat switch state unterval is 50ms. SO if 50ms pass, check the heat control button
   {
-    if
+    if (digitalRead(YellowButtonSignal4Pin) == HIGH) //if yellow button 4 is pressed then
+    {
+      if (HeatSwitchState == 0) //if the state was OFF, turn it ON
+      {
+        HeatSwitchState = 1; //make the state ON
+        digitalWrite(YellowButtonLED4Pin, HIGH); //turn button 4 LED ON
+      }
+      else if (HeatSwitchState == 1) //if the state was ON, turn it OFF
+      {
+        HeatSwitchState = 0; // make the state OFF
+        digitalWrite(YellowButtonLED4Pin, LOW); //turn button 4 LED off
+      }
+    }
   }
 
-/* Heating Element  */
-if (CurrentTime - PreviousHeatTime > HeatInterval) // Heat interval is 10ms. so if 20ms pass, check the temperatures and heat accordingly
+  /* Heating Element  */
+  if (CurrentTime - PreviousHeatTime > HeatInterval) // Heat interval is 10ms. so if 20ms pass, check the temperatures and heat accordingly
   {
-    if (T2Temp < TargetTempMin) // if temp is lower than minimu, heat at full power
+    if ((T2Temp < TargetTempMin) && (HeatSwitchState == 1)) // if temp is lower than minimu, heat at full power if heat is ON
     {
       analogWrite(HeatPWMPin, 4096); //100% duty cycle aka full power
     }
 
-    else if ((T2Temp >= TargetTempMin) && (T2Temp <= TargetTemp)) //if temp is just below target temp, then heat with 75% power
+    else if ((T2Temp >= TargetTempMin) && (T2Temp <= TargetTemp) && (HeatSwitchState == 1)) //if temp is just below target temp, then heat with 75% power if heat is ON
     {
       analogWrite(HeatPWMPin, 3072); //75% duty cycle, aka 75 % power
     }
 
-    else if ((T2Temp <= TargetTempMax) && (T2Temp >= TargetTemp))// if temp is just above target temp, then heat at 50% power
+    else if ((T2Temp <= TargetTempMax) && (T2Temp >= TargetTemp) && (HeatSwitchState == 1))// if temp is just above target temp, then heat at 50% power if heat is ON
     {
       analogWrite(HeatPWMPin, 2048); //50% duty cycle, aka 50% power
     }
 
-    else if (T2Temp > TargetTempMax) //if temp is above the target temp, then heat at 25% power
+    else if ((T2Temp > TargetTempMax) && (HeatSwitchState == 1)) //if temp is above the target temp, then heat at 25% power if heat in ON
     {
       analogWrite(HeatPWMPin, 1024); //25% duty cycle, aka 25% power
     }
