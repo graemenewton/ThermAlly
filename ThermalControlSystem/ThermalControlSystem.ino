@@ -88,6 +88,7 @@ int BaselineTempInteger;
 int BaselineTempState = 0;
 int GreenButtonSwitchState;
 int DACTempOutput;
+int HeatSwitctState = 0;
 
 
 //Floats
@@ -111,6 +112,8 @@ unsigned long PreviousLEDTime = 0;
 unsigned long LEDInterval = 100;
 unsigned long PreviousHeatTime = 0;
 unsigned long HeatInterval = 10;
+unsigned long PreviousHeatSwitchStateTime = 0;
+unsigned long HeatSwitchStateInterval = 50;
 unsigned long PreviousDACTime = 0;
 unsigned long DACInterval = 1;
 
@@ -450,6 +453,7 @@ void setup()
 
   dac.begin(0x63); //begin communications with the MCP4725 dac module at I2C address 0x62
 
+  digitalWrite(RedLEDPin, LOW);
   digitalWrite(YellowLEDPin, LOW);
   digitalWrite(GreenLEDPin, HIGH);
   digitalWrite(YellowButtonLED1Pin, HIGH);
@@ -503,8 +507,14 @@ void loop()
     dac.setVoltage(DACTempOutput, false); //false means the value is not saved to DAC I2C board EEPROM
   }
 
-  /* Heating Element  */
-  if (CurrentTime - PreviousHeatTime > HeatInterval) // Heat interval is 10ms. so if 20ms pass, check the temperatures and heat accordingly
+  /* Heat On/Off Switch*/
+  if (CurrentTime - PreviousHeatSwitchStateTime > HeatSwitchStateInterval) //Heat switch state unterval is 50ms. SO if 50ms pass, check the heat control button
+  {
+    if
+  }
+
+/* Heating Element  */
+if (CurrentTime - PreviousHeatTime > HeatInterval) // Heat interval is 10ms. so if 20ms pass, check the temperatures and heat accordingly
   {
     if (T2Temp < TargetTempMin) // if temp is lower than minimu, heat at full power
     {
