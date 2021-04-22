@@ -93,6 +93,7 @@ int BaselineTempState = 0;
 int GreenButtonSwitchState;
 int DACTempOutput;
 int HeatEnable = 0;
+int HeatRampSetupState = 0;
 int HeatRampState = 0;
 int HeatRampTempInteger;
 
@@ -119,6 +120,8 @@ unsigned long PreviousHeatTime = 0;
 unsigned long HeatInterval = 10;
 unsigned long PreviousHeatEnableTime = 0;
 unsigned long HeatEnableInterval = 50;
+unsigned long PreviousHeatRampSetupTime = 0;
+unsigned long HeatRampSetupInterval = 50;
 unsigned long PreviousHeatRampTime = 0;
 unsigned long HeatRampInterval = 50;
 unsigned long PreviousDACTime = 0;
@@ -143,7 +146,6 @@ Adafruit_MCP4725 dac; //define dac as an mcp4725 module
 
 void setup()
 {
-
 
   /* Set the pin modes. */
   pinMode(PotPin1, INPUT); //10 turn potentiometer
@@ -561,14 +563,14 @@ void loop()
   }
 
   /* Heat Ramp Temperature Selection */
-  if (CurrentTime - PreviousHeatRampTime > HeatRampInterval) //every 50ms check button 1 and if it is pressed, begin the heat ramp setup
+  if (CurrentTime - PreviousHeatRampSetupTime > HeatRampSetupInterval) //every 50ms check button 1 and if it is pressed, begin the heat ramp setup
   {
     if (digitalRead(YellowButtonSignal1Pin) == HIGH) //if the first yellow button is pressed
     {
       digitalWrite(YellowLEDPin, HIGH); //turn the busy light on
       digitalWrite(GreenButtonLEDPin, HIGH); //turn green button LED on to indicated it can be operated
-      HeatRampState = 0; //set heat ramp state to 0
-      while (HeatRampState == 0) //while the heat ramp temp has not been set do the following:
+      HeatRampSetupState = 0; //set heat ramp setupstate to 0
+      while (HeatRampSetupState == 0) //while the heat ramp temp has not been set do the following:
       {
         HeatRampTempInteger = map(analogRead(PotPin1), 0, 4095, 0 , 5000); //map the 10-turn potentiometer to 0-50 degrees C
         HeatRampTemp = (float)HeatRampTempInteger / 100; //pass heatramptempinteger as a float so it can be divided into non whole numbers and store float
@@ -584,7 +586,7 @@ void loop()
         if (digitalRead(GreenButtonSignalPin) == HIGH) //if the green button is pressed then:
         {
           digitalWrite(GreenButtonLEDPin, LOW); //turn the button led off
-          HeatRampState = 1; //make the state of the heat ramp to 1, marking it as chosen, and exit the while() loop
+          HeatRampSetupState = 1; //make the state of the heat ramp to 1, marking it as chosen, and exit the while() loop
         }
         delay(100); //delay used here rather than millis() as no other loops required to run while selecting the heat ramp temp.
       }
@@ -594,7 +596,7 @@ void loop()
   /* Heat Ramp Execution*/
   if (CurrentTime - PreviousHeatRampTime > HeatRampInterval)
   {
-    
+
   }
 
 
