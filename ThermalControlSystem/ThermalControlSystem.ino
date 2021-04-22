@@ -560,7 +560,7 @@ void loop()
 
   }
 
-  /* Heat Ramp */
+  /* Heat Ramp Temperature Selection */
   if (CurrentTime - PreviousHeatRampTime > HeatRampInterval) //every 50ms check button 1 and if it is pressed, begin the heat ramp setup
   {
     if (digitalRead(YellowButtonSignal1Pin) == HIGH) //if the first yellow button is pressed
@@ -568,7 +568,7 @@ void loop()
       digitalWrite(YellowLEDPin, HIGH); //turn the busy light on
       digitalWrite(GreenButtonLEDPin, HIGH); //turn green button LED on to indicated it can be operated
       HeatRampState = 0; //set heat ramp state to 0
-      while (HeatRampState == 0) //while the heat ramp temp has not been set do the following: 
+      while (HeatRampState == 0) //while the heat ramp temp has not been set do the following:
       {
         HeatRampTempInteger = map(analogRead(PotPin1), 0, 4095, 0 , 5000); //map the 10-turn potentiometer to 0-50 degrees C
         HeatRampTemp = (float)HeatRampTempInteger / 100; //pass heatramptempinteger as a float so it can be divided into non whole numbers and store float
@@ -588,10 +588,14 @@ void loop()
         }
         delay(100); //delay used here rather than millis() as no other loops required to run while selecting the heat ramp temp.
       }
-
     }
   }
 
+  /* Heat Ramp Execution*/
+  if (CurrentTime - PreviousHeatRampTime > HeatRampInterval)
+  {
+    
+  }
 
 
 
