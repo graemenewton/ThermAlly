@@ -88,7 +88,7 @@ int BaselineTempInteger;
 int BaselineTempState = 0;
 int GreenButtonSwitchState;
 int DACTempOutput;
-int HeatSwitchState = 0;
+int HeatEnable = 0;
 
 
 //Floats
@@ -100,9 +100,8 @@ float DACTempVoltage;
 float MaxDACTemp = 50.00; //max temp is 50C, this controls the DAC resolution. 0-50C will be split into a 12 bit scale (4096). Resolution of 0.012C for every number.
 
 float BaselineTemp = 32.0;
-float TargetTemp = 32.0;
-float TargetTempMin;
-float TargetTempMax;
+float BaselineTempMin;
+float BaselineTempMax;
 
 
 unsigned long CurrentTime = 0;
@@ -112,10 +111,13 @@ unsigned long PreviousLEDTime = 0;
 unsigned long LEDInterval = 100;
 unsigned long PreviousHeatTime = 0;
 unsigned long HeatInterval = 10;
-unsigned long PreviousHeatSwitchStateTime = 0;
-unsigned long HeatSwitchStateInterval = 50;
+unsigned long PreviousHeatEnableTime = 0;
+unsigned long HeatEnableInterval = 50;
+unsigned long PreviousHeatRampTime = 0;
+unsigned long HeatRampInterval = 150;
 unsigned long PreviousDACTime = 0;
 unsigned long DACInterval = 1;
+
 
 /* Syntax for LCD pin numbers:
   LiquidCrystal(rs, enable, d4, d5, d6, d7)
@@ -508,48 +510,54 @@ void loop()
   }
 
   /* Heat On/Off Switch*/
-  if (CurrentTime - PreviousHeatSwitchStateTime > HeatSwitchStateInterval) //Heat switch state unterval is 50ms. SO if 50ms pass, check the heat control button
+  if (CurrentTime - PreviousHeatEnableTime > HeatEnableInterval) //Heat switch state unterval is 50ms. SO if 50ms pass, check the heat control button
   {
     if (digitalRead(YellowButtonSignal4Pin) == HIGH) //if yellow button 4 is pressed then
     {
-      if (HeatSwitchState == 0) //if the state was OFF, turn it ON
+      if (HeatEnable == 0) //if the state was OFF, turn it ON
       {
-        HeatSwitchState = 1; //make the state ON
+        HeatEnable = 1; //make the state ON
         digitalWrite(YellowButtonLED4Pin, HIGH); //turn button 4 LED ON
         digitalWrite(GreenLEDPin, HIGH);
       }
-      else if (HeatSwitchState == 1) //if the state was ON, turn it OFF
+      else if (HeatEnable == 1) //if the state was ON, turn it OFF
       {
-        HeatSwitchState = 0; // make the state OFF
+        HeatEnable = 0; // make the state OFF
         digitalWrite(YellowButtonLED4Pin, LOW); //turn button 4 LED off
         digitalWrite(GreenLEDPin, LOW);
       }
     }
   }
 
-  /* Heating Element  */
+  /* Baseline Heating  */
   if (CurrentTime - PreviousHeatTime > HeatInterval) // Heat interval is 10ms. so if 20ms pass, check the temperatures and heat accordingly
   {
-    if ((T2Temp < TargetTempMin) && (HeatSwitchState == 1)) // if temp is lower than minimu, heat at full power if heat is ON
+    if ((T2Temp < BaselineTempMin) && (HeatEnable == 1)) // if temp is lower than minimu, heat at full power if heat is ON
     {
       analogWrite(HeatPWMPin, 4096); //100% duty cycle aka full power
     }
 
-    else if ((T2Temp >= TargetTempMin) && (T2Temp <= TargetTemp) && (HeatSwitchState == 1)) //if temp is just below target temp, then heat with 75% power if heat is ON
+    else if ((T2Temp >= BaselineTempMin) && (T2Temp <= BaselineTemp) && (HeatEnable == 1)) //if temp is just below target temp, then heat with 75% power if heat is ON
     {
       analogWrite(HeatPWMPin, 3072); //75% duty cycle, aka 75 % power
     }
 
-    else if ((T2Temp <= TargetTempMax) && (T2Temp >= TargetTemp) && (HeatSwitchState == 1))// if temp is just above target temp, then heat at 50% power if heat is ON
+    else if ((T2Temp <= BaselineTempMax) && (T2Temp >= BaselineTemp) && (HeatEnable == 1))// if temp is just above target temp, then heat at 50% power if heat is ON
     {
       analogWrite(HeatPWMPin, 2048); //50% duty cycle, aka 50% power
     }
 
-    else if ((T2Temp > TargetTempMax) && (HeatSwitchState == 1)) //if temp is above the target temp, then heat at 25% power if heat in ON
+    else if ((T2Temp > BaselineTempMax) && (HeatEnable == 1)) //if temp is above the target temp, then heat at 25% power if heat in ON
     {
       analogWrite(HeatPWMPin, 1024); //25% duty cycle, aka 25% power
     }
 
+  }
+
+  /* Heat Ramp */
+  if (CurrentTime - PreviousHeatRampTime > HeatRampInterval) // 
+  {
+    
   }
 
 
