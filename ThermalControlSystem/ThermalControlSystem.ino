@@ -455,7 +455,7 @@ void setup()
 
   digitalWrite(RedLEDPin, LOW);
   digitalWrite(YellowLEDPin, LOW);
-  digitalWrite(GreenLEDPin, HIGH);
+  digitalWrite(GreenLEDPin, LOW);
   digitalWrite(YellowButtonLED1Pin, LOW);
   digitalWrite(YellowButtonLED2Pin, LOW);
   digitalWrite(YellowButtonLED3Pin, LOW);
@@ -516,11 +516,13 @@ void loop()
       {
         HeatSwitchState = 1; //make the state ON
         digitalWrite(YellowButtonLED4Pin, HIGH); //turn button 4 LED ON
+        digitalWrite(GreenLEDPin, HIGH);
       }
       else if (HeatSwitchState == 1) //if the state was ON, turn it OFF
       {
         HeatSwitchState = 0; // make the state OFF
         digitalWrite(YellowButtonLED4Pin, LOW); //turn button 4 LED off
+        digitalWrite(GreenLEDPin, LOW);
       }
     }
   }
