@@ -2,6 +2,10 @@
 // 10 bits resolution returns values between 0-1023, 8 bits resolution returns values between 0-255, 12 bits resolution returns values between 0-4096
 
 
+//green LED indicates that heating is enabled
+//yellow led indicates that device is busy, i.e. selectin temperature or doing a ramp
+//red indicates not ready for operation
+
 //direct from MCP_9600 github, converstion to celcius is by *0.0625
 /* float Adafruit_MCP9600::readThermocouple(void) {
   // if (!enabled()) {
@@ -89,6 +93,8 @@ int BaselineTempState = 0;
 int GreenButtonSwitchState;
 int DACTempOutput;
 int HeatEnable = 0;
+int HeatRampState = 0;
+int HeatRampTempInteger;
 
 
 //Floats
@@ -102,7 +108,7 @@ float MaxDACTemp = 50.00; //max temp is 50C, this controls the DAC resolution. 0
 float BaselineTemp = 32.0;
 float BaselineTempMin;
 float BaselineTempMax;
-
+float HeatRampTemp;
 
 unsigned long CurrentTime = 0;
 unsigned long PreviousDisplayTime = 0;
@@ -114,7 +120,7 @@ unsigned long HeatInterval = 10;
 unsigned long PreviousHeatEnableTime = 0;
 unsigned long HeatEnableInterval = 50;
 unsigned long PreviousHeatRampTime = 0;
-unsigned long HeatRampInterval = 150;
+unsigned long HeatRampInterval = 50;
 unsigned long PreviousDACTime = 0;
 unsigned long DACInterval = 1;
 
@@ -405,8 +411,6 @@ void setup()
   lcd.print("   Setup Complete!");
   lcd.setCursor(0, 2);
   lcd.print("  Ready to operate!");
-  digitalWrite(RedLEDPin, LOW);
-  digitalWrite(GreenLEDPin, HIGH);
   delay(1000); //slight delay before starting loop, the message will be displayed until something new is overwritten
 
   /* The ADC and DAC resolution is set to 10 bit by default for compatability purposes with other arduino boards, however, the Due is capable of higher resolution. */
@@ -437,6 +441,8 @@ void setup()
     {
       digitalWrite(GreenButtonLEDPin, LOW);
       BaselineTempState = 1; //make the state of the baseline temperature 1, marking it as chosen, and exit the while() loop
+      BaselineTempMin = (BaselineTemp - 1); //once baseline temp is selected, calculate the min
+      BaselineTempMax = (BaselineTemp + 1); //once baseline temp is selected, calculate the max
     }
     delay(100); //delay used here rather than millis() as no other loops required to run while selecting the baseline temp.
   }
@@ -555,9 +561,35 @@ void loop()
   }
 
   /* Heat Ramp */
-  if (CurrentTime - PreviousHeatRampTime > HeatRampInterval) // 
+  if (CurrentTime - PreviousHeatRampTime > HeatRampInterval) //every 50ms check button 1 and if it is pressed, begin the heat ramp setup
   {
-    
+    if (digitalRead(YellowButtonSignal1Pin) == HIGH) //if the first yellow button is pressed
+    {
+      digitalWrite(YellowLEDPin, HIGH); //turn the busy light on
+      digitalWrite(GreenButtonLEDPin, HIGH); //turn green button LED on to indicated it can be operated
+      HeatRampState = 0; //set heat ramp state to 0
+      while (HeatRampState == 0) //while the heat ramp temp has not been set do the following: 
+      {
+        HeatRampTempInteger = map(analogRead(PotPin1), 0, 4095, 0 , 5000); //map the 10-turn potentiometer to 0-50 degrees C
+        HeatRampTemp = (float)HeatRampTempInteger / 100; //pass heatramptempinteger as a float so it can be divided into non whole numbers and store float
+        lcd.clear(); //clear the LCD and print the baseline temperature annotation
+        lcd.setCursor(0, 0);
+        lcd.print("   Heat Ramp Temp   ");
+        lcd.setCursor(0, 1);
+        lcd.print("        "), lcd.print(HeatRampTemp);
+        lcd.setCursor(0, 2);
+        lcd.print(" Press Green Button");
+        lcd.setCursor(0, 3);
+        lcd.print("     To Confirm     ");
+        if (digitalRead(GreenButtonSignalPin) == HIGH) //if the green button is pressed then:
+        {
+          digitalWrite(GreenButtonLEDPin, LOW); //turn the button led off
+          HeatRampState = 1; //make the state of the heat ramp to 1, marking it as chosen, and exit the while() loop
+        }
+        delay(100); //delay used here rather than millis() as no other loops required to run while selecting the heat ramp temp.
+      }
+
+    }
   }
 
 
