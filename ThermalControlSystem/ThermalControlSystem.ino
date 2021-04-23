@@ -124,9 +124,14 @@ unsigned long PreviousHeatRampSetupTime = 0;
 unsigned long HeatRampSetupInterval = 50;
 unsigned long PreviousHeatRampTime = 0;
 unsigned long HeatRampInterval = 10;
+unsigned long HoldTempTime;
+unsigned long HeatRampHoldTime = 3000;
 unsigned long PreviousDACTime = 0;
 unsigned long DACInterval = 1;
 
+
+/* Boolean*/
+boolean AlreadyRun = false;
 
 /* Syntax for LCD pin numbers:
   LiquidCrystal(rs, enable, d4, d5, d6, d7)
@@ -614,8 +619,8 @@ void loop()
   /* Heat Ramp Execution*/
   if ((CurrentTime - PreviousHeatRampTime > HeatRampInterval) && (HeatRampSetupState == 2)) //if 10ms has past and heatramp setup is completed, then do the following
   {
-    HeatRampState = 1; //if the ramp has been set up, set the heat ramp state to 1
     PreviousHeatRampTime = CurrentTime; //update the previous time with the current time
+    HeatRampState = 1; //if the ramp has been set up, set the heat ramp state to 1
     while (HeatRampState == 1) //while the heat ramp state is 1
     {
       if ((T2Temp < HeatRampTemp) && (HeatEnable == 1)) // if temp is lower than HeatRampTemp, heat at full power if heating is enabled
@@ -633,9 +638,16 @@ void loop()
         analogWrite(HeatPWMPin, 1024); //25% duty cycle, aka 25% power
       }
 
-      if (T2Temp < HeatRampTemp)
+      if ((T2Temp > HeatRampTemp) && (AlreadyRun == false)) //because of boolean, this will only be run once
       {
+        HoldTempTime = CurrentTime; //this function starts the timer so we can hold the temperature for a few seconds
+        AlreadyRun == true;
+      }
 
+      if (CurrentTime - HoldTempTime > HeatRampHoldTime)
+      {
+        HeatRampState = 0; //reset the heat ramp state
+        AlreadyRun == false; //reset the already run boolean
       }
     }
 
