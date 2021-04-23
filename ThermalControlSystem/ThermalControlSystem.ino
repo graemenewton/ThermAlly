@@ -644,9 +644,9 @@ void loop()
         AlreadyRun == true;
       }
 
-      if (CurrentTime - HoldTempTime > HeatRampHoldTime)
+      if (CurrentTime - HoldTempTime > HeatRampHoldTime) //if it has been at temperature for more than 3000ms, then
       {
-        HeatRampState = 0; //reset the heat ramp state
+        HeatRampState = 0; //reset the heat ramp state, causing exit of the while() loop
         AlreadyRun == false; //reset the already run boolean
       }
     }
