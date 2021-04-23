@@ -99,19 +99,20 @@ int HeatRampTempInteger;
 
 
 //Floats
-float T1Temp; //T1Temp is heat exchanger, store as float T1Temp //note that floats must be used in equations as dividing integers will cause errors as they
-//cannot have decimal points.
-float T2Temp; //T2Temp is bath, store as float T2Temp // e.g. 7/2 is 3.5 but this will not work with integer notation
+float T1Temp; //T1Temp is heat exchanger, store as float T1Temp 
+float T2Temp; //T2Temp is bath, store as float T2Temp 
 float TempVoltage;
 float DACTempVoltage;
 float MaxDACTemp = 50.00; //max temp is 50C, this controls the DAC resolution. 0-50C will be split into a 12 bit scale (4096). Resolution of 0.012C for every number.
 
-float BaselineTemp = 32.0;
+float BaselineTemp;
 float BaselineTempMin;
 float BaselineTempMax;
 float HeatRampTemp;
 
 unsigned long CurrentTime = 0;
+unsigned long PreviousTempReadTime;
+unsigned long TempReadInterval = 1;
 unsigned long PreviousDisplayTime = 0;
 unsigned long DisplayInterval = 100;
 unsigned long PreviousLEDTime = 0;
@@ -399,12 +400,13 @@ void setup()
   lcd.clear();
 
   /* Code can be added here to set alerts. These can be used for safety features such as to shut off in the case of overheating. */
-
+/*
   mcp1.setAlertTemperature(1, 60); //an exmaple of how an alert can be set, e.g. for auto shut off if temps hit over 50
   Serial.print("Alert #1 temperature set to ");
   Serial.println(mcp1.getAlertTemperature(1)); //get alert 1 temperature from TC1 MCP9600
   mcp1.configureAlert(1, true, true);  // alert 1 enabled, rising temp
-
+  */
+//
   /* Enable the two MCP9600 I2C devices. */
 
   mcp1.enable(true);
@@ -454,6 +456,8 @@ void setup()
     delay(100); //delay used here rather than millis() as no other loops required to run while selecting the baseline temp.
   }
 
+  digitalWrite(GreenButtonLEDPin, LOW);
+
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Baseline Temperature");
@@ -483,6 +487,17 @@ void loop()
 
   CurrentTime = millis(); //store the millis() value as the current time
 
+  /* Store temperatures for T1 and T2 as variables */ /* //can put thermocuple reading scrip here if want to limit it to 1000hz
+  if (CurrentTime - PreviousTempReadTime > TempReadInterval)
+  {
+    PreviousTempReadTime = CurrentTime;
+    T1Temp = mcp1.readThermocouple(); //T1Temp is heat exchanger, store as float T1Temp
+    T2Temp = mcp2.readThermocouple(); //T2Temp is bath, store as float T2Temp
+  }
+  */
+
+    T1Temp = mcp1.readThermocouple(); //T1Temp is heat exchanger, store as float T1Temp
+    T2Temp = mcp2.readThermocouple(); //T2Temp is bath, store as float T2Temp
 
   /* Display refresh*/
   if (CurrentTime - PreviousDisplayTime > DisplayInterval) // display interval is 100ms, so: if 100ms has passed, then the lcd and serial monitors will print info
@@ -509,19 +524,14 @@ void loop()
   }
 
 
-  /* Store temperatures for T1 and T2 as variables */
-  T1Temp = mcp1.readThermocouple(); //T1Temp is heat exchanger, store as float T1Temp
-  T2Temp = mcp2.readThermocouple(); //T2Temp is bath, store as float T2Temp
-
-  /* DAC Output Temperature  */
+  /* DAC Output Temperature  */ /*
   if (CurrentTime - PreviousDACTime > DACInterval) //DAC Interval is 1ms, aka 1000Hz
   {
     PreviousDACTime = CurrentTime; //update the previous time from 0 to when it was done
-    TempVoltage = (mcp2.readThermocouple() / MaxDACTemp); //v high resolution for DAC scaling, but limited to 0-50C temp range.
-    DACTempVoltage = (TempVoltage * 4096); // 12 bit resolution, max of 3.3V as that is Vcc.
-    DACTempOutput = ((int)DACTempVoltage); //pass the DACTempVoltage float as an integer and on 12 bit scale (0-4095) to set the DAC voltage
-    dac.setVoltage(DACTempOutput, false); //false means the value is not saved to DAC I2C board EEPROM
+
+    //Previous DAC output script causes error in thermocuple function somehow, need to revise.
   }
+*/
 
   /* Heat On/Off Switch*/
   if (CurrentTime - PreviousHeatEnableTime > HeatEnableInterval) //Heat switch state unterval is 50ms. SO if 50ms pass, check the heat control button
@@ -543,6 +553,7 @@ void loop()
       }
     }
   }
+
 
   /* Baseline Heating  */
   if (CurrentTime - PreviousHeatTime > HeatInterval) // Heat interval is 10ms. so if 20ms pass, check the temperatures and heat accordingly
@@ -568,6 +579,7 @@ void loop()
       analogWrite(HeatPWMPin, 1024); //25% duty cycle, aka 25% power
     }
   }
+
 
   /* Heat Ramp Temperature Selection */
   //in its current form, this means baseline heating will not occur while selecting temperature.
@@ -615,6 +627,7 @@ void loop()
 
     }
   }
+
 
   /* Heat Ramp Execution*/
   if ((CurrentTime - PreviousHeatRampTime > HeatRampInterval) && (HeatRampSetupState == 2)) //if 10ms has past and heatramp setup is completed, then do the following
