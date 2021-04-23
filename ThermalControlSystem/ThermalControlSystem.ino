@@ -563,13 +563,13 @@ void loop()
   }
 
   /* Heat Ramp Temperature Selection */
+  //in its current form, this means baseline heating will not occur while selecting temperature.
   if (CurrentTime - PreviousHeatRampSetupTime > HeatRampSetupInterval) //every 50ms check button 1 and if it is pressed, begin the heat ramp setup
   {
     if (digitalRead(YellowButtonSignal1Pin) == HIGH) //if the first yellow button is pressed
     {
       digitalWrite(YellowLEDPin, HIGH); //turn the busy light on
       digitalWrite(GreenButtonLEDPin, HIGH); //turn green button LED on to indicated it can be operated
-      HeatRampSetupState = 0; //set heat ramp setupstate to 0
       while (HeatRampSetupState == 0) //while the heat ramp temp has not been set do the following:
       {
         HeatRampTempInteger = map(analogRead(PotPin1), 0, 4095, 0 , 5000); //map the 10-turn potentiometer to 0-50 degrees C
@@ -590,11 +590,26 @@ void loop()
         }
         delay(100); //delay used here rather than millis() as no other loops required to run while selecting the heat ramp temp.
       }
+      while (HeatRampSetupState == 1) //while the state is 1, i.e. the ramp rmp has been set
+      {
+        lcd.clear(); //clear the LCD and print the baseline temperature annotation
+        lcd.setCursor(0, 1);
+        lcd.print(" Press Green Button ");
+        lcd.setCursor(0, 2);
+        lcd.print(" To Begin Heat Ramp ");
+        if (digitalRead(GreenButtonSignalPin) == HIGH) //if the green button is pressed then:
+        {
+          digitalWrite(GreenButtonLEDPin, LOW); //turn the button led off
+          HeatRampSetupState = 2; //make the state of the heat ramp to 1, marking it as chosen, and exit the while() loop
+        }
+        delay(100); //delay used here rather than millis() as no other loops required to run while selecting the heat ramp temp.
+      }
+
     }
   }
 
   /* Heat Ramp Execution*/
-  if (CurrentTime - PreviousHeatRampTime > HeatRampInterval)
+  if ((CurrentTime - PreviousHeatRampTime > HeatRampInterval) && (HeatRampSetupState == 1)) //is 50ms has past and heatramp setup is completed, then do the following
   {
 
   }
