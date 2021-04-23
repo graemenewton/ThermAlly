@@ -123,7 +123,7 @@ unsigned long HeatEnableInterval = 50;
 unsigned long PreviousHeatRampSetupTime = 0;
 unsigned long HeatRampSetupInterval = 50;
 unsigned long PreviousHeatRampTime = 0;
-unsigned long HeatRampInterval = 50;
+unsigned long HeatRampInterval = 10;
 unsigned long PreviousDACTime = 0;
 unsigned long DACInterval = 1;
 
@@ -482,7 +482,7 @@ void loop()
   /* Display refresh*/
   if (CurrentTime - PreviousDisplayTime > DisplayInterval) // display interval is 100ms, so: if 100ms has passed, then the lcd and serial monitors will print info
   {
-    PreviousDisplayTime = CurrentTime; //update the previous display time with the current time
+    PreviousDisplayTime = CurrentTime; //update the previous time with the current time
     TCSerialPrint(); //uses custom function to print Theromcouple paramaters to Serial port. See TCSerialPrint.ino tab
     TCLCDPrint(); //uses custom function to print Theromcouple parameters to LCD display. See TCLCDPrint.ino tab
   }
@@ -511,6 +511,7 @@ void loop()
   /* DAC Output Temperature  */
   if (CurrentTime - PreviousDACTime > DACInterval) //DAC Interval is 1ms, aka 1000Hz
   {
+    PreviousDACTime = CurrentTime; //update the previous time from 0 to when it was done
     TempVoltage = (mcp2.readThermocouple() / MaxDACTemp); //v high resolution for DAC scaling, but limited to 0-50C temp range.
     DACTempVoltage = (TempVoltage * 4096); // 12 bit resolution, max of 3.3V as that is Vcc.
     DACTempOutput = ((int)DACTempVoltage); //pass the DACTempVoltage float as an integer and on 12 bit scale (0-4095) to set the DAC voltage
@@ -520,6 +521,7 @@ void loop()
   /* Heat On/Off Switch*/
   if (CurrentTime - PreviousHeatEnableTime > HeatEnableInterval) //Heat switch state unterval is 50ms. SO if 50ms pass, check the heat control button
   {
+    PreviousHeatEnableTime = CurrentTime;  //update the previous time with the current time
     if (digitalRead(YellowButtonSignal4Pin) == HIGH) //if yellow button 4 is pressed then
     {
       if (HeatEnable == 0) //if the state was OFF, turn it ON
@@ -540,6 +542,7 @@ void loop()
   /* Baseline Heating  */
   if (CurrentTime - PreviousHeatTime > HeatInterval) // Heat interval is 10ms. so if 20ms pass, check the temperatures and heat accordingly
   {
+    PreviousHeatTime = CurrentTime;  //update the previous time with the current time
     if ((T2Temp < BaselineTempMin) && (HeatEnable == 1)) // if temp is lower than minimu, heat at full power if heat is ON
     {
       analogWrite(HeatPWMPin, 4096); //100% duty cycle aka full power
@@ -559,13 +562,13 @@ void loop()
     {
       analogWrite(HeatPWMPin, 1024); //25% duty cycle, aka 25% power
     }
-
   }
 
   /* Heat Ramp Temperature Selection */
   //in its current form, this means baseline heating will not occur while selecting temperature.
   if (CurrentTime - PreviousHeatRampSetupTime > HeatRampSetupInterval) //every 50ms check button 1 and if it is pressed, begin the heat ramp setup
   {
+    PreviousHeatRampSetupTime = CurrentTime; //update the previous time with the current time
     if (digitalRead(YellowButtonSignal1Pin) == HIGH) //if the first yellow button is pressed
     {
       digitalWrite(YellowLEDPin, HIGH); //turn the busy light on
@@ -600,7 +603,7 @@ void loop()
         if (digitalRead(GreenButtonSignalPin) == HIGH) //if the green button is pressed then:
         {
           digitalWrite(GreenButtonLEDPin, LOW); //turn the button led off
-          HeatRampSetupState = 2; //make the state of the heat ramp to 1, marking it as chosen, and exit the while() loop
+          HeatRampSetupState = 2; //make the state of the heat ramp to 2, marking it as chosen, and exit the while() loop
         }
         delay(100); //delay used here rather than millis() as no other loops required to run while selecting the heat ramp temp.
       }
@@ -609,8 +612,9 @@ void loop()
   }
 
   /* Heat Ramp Execution*/
-  if ((CurrentTime - PreviousHeatRampTime > HeatRampInterval) && (HeatRampSetupState == 1)) //is 50ms has past and heatramp setup is completed, then do the following
+  if ((CurrentTime - PreviousHeatRampTime > HeatRampInterval) && (HeatRampSetupState == 2)) //if 10ms has past and heatramp setup is completed, then do the following
   {
+    PreviousHeatRampTime = CurrentTime; //update the previous time with the current time
 
   }
 
