@@ -614,8 +614,33 @@ void loop()
   /* Heat Ramp Execution*/
   if ((CurrentTime - PreviousHeatRampTime > HeatRampInterval) && (HeatRampSetupState == 2)) //if 10ms has past and heatramp setup is completed, then do the following
   {
+    HeatRampState = 1; //if the ramp has been set up, set the heat ramp state to 1
     PreviousHeatRampTime = CurrentTime; //update the previous time with the current time
+    while (HeatRampState == 1) //while the heat ramp state is 1
+    {
+      if ((T2Temp < HeatRampTemp) && (HeatEnable == 1)) // if temp is lower than HeatRampTemp, heat at full power if heating is enabled
+      {
+        analogWrite(HeatPWMPin, 4096); //100% duty cycle aka full power
+      }
 
+      else if ((T2Temp > HeatRampTemp) && (T2Temp < (HeatRampTemp + 1)) && (HeatEnable == 1)) //if temp is just above temp, then heat with 50% power
+      {
+        analogWrite(HeatPWMPin, 2048); //50% duty cycle, aka 50 % power
+      }
+
+      else if ((T2Temp > (HeatRampTemp + 1)) && (HeatEnable == 1)) //if temp is above the target temp, then heat at 25% power if heat in ON
+      {
+        analogWrite(HeatPWMPin, 1024); //25% duty cycle, aka 25% power
+      }
+
+      if (T2Temp < HeatRampTemp)
+      {
+
+      }
+    }
+
+
+    HeatRampSetupState = 0; //reset the setup state so if another ramp selected, you will be prompted to select heat ramp temp/
   }
 
 
