@@ -96,11 +96,14 @@ int HeatEnable = 0;
 int HeatRampSetupState = 0;
 int HeatRampState = 0;
 int HeatRampTempInteger;
+int ColdRampSetupState = 0;
+int ColdRampState = 0;
+int ColdRampTempInteger;
 
 
 //Floats
-float T1Temp; //T1Temp is heat exchanger, store as float T1Temp 
-float T2Temp; //T2Temp is bath, store as float T2Temp 
+float T1Temp; //T1Temp is heat exchanger, store as float T1Temp
+float T2Temp; //T2Temp is bath, store as float T2Temp
 float TempVoltage;
 float DACTempVoltage;
 float MaxDACTemp = 50.00; //max temp is 50C, this controls the DAC resolution. 0-50C will be split into a 12 bit scale (4096). Resolution of 0.012C for every number.
@@ -109,6 +112,7 @@ float BaselineTemp;
 float BaselineTempMin;
 float BaselineTempMax;
 float HeatRampTemp;
+float ColdRampTemp;
 
 unsigned long CurrentTime = 0;
 unsigned long PreviousTempReadTime;
@@ -127,6 +131,11 @@ unsigned long PreviousHeatRampTime = 0;
 unsigned long HeatRampInterval = 10;
 unsigned long HoldTempTime;
 unsigned long HeatRampHoldTime = 3000;
+unsigned long PreviousColdRampSetupTime = 0;
+unsigned long ColdRampSetupInterval = 50;
+unsigned long PreviousColdRampTime = 0;
+unsigned long ColdRampInterval = 10;
+unsigned long ColdRampHoldTime = 3000;
 unsigned long PreviousDACTime = 0;
 unsigned long DACInterval = 1;
 
@@ -400,13 +409,13 @@ void setup()
   lcd.clear();
 
   /* Code can be added here to set alerts. These can be used for safety features such as to shut off in the case of overheating. */
-/*
-  mcp1.setAlertTemperature(1, 60); //an exmaple of how an alert can be set, e.g. for auto shut off if temps hit over 50
-  Serial.print("Alert #1 temperature set to ");
-  Serial.println(mcp1.getAlertTemperature(1)); //get alert 1 temperature from TC1 MCP9600
-  mcp1.configureAlert(1, true, true);  // alert 1 enabled, rising temp
+  /*
+    mcp1.setAlertTemperature(1, 60); //an exmaple of how an alert can be set, e.g. for auto shut off if temps hit over 50
+    Serial.print("Alert #1 temperature set to ");
+    Serial.println(mcp1.getAlertTemperature(1)); //get alert 1 temperature from TC1 MCP9600
+    mcp1.configureAlert(1, true, true);  // alert 1 enabled, rising temp
   */
-//
+  //
   /* Enable the two MCP9600 I2C devices. */
 
   mcp1.enable(true);
@@ -488,16 +497,16 @@ void loop()
   CurrentTime = millis(); //store the millis() value as the current time
 
   /* Store temperatures for T1 and T2 as variables */ /* //can put thermocuple reading scrip here if want to limit it to 1000hz
-  if (CurrentTime - PreviousTempReadTime > TempReadInterval)
-  {
+    if (CurrentTime - PreviousTempReadTime > TempReadInterval)
+    {
     PreviousTempReadTime = CurrentTime;
     T1Temp = mcp1.readThermocouple(); //T1Temp is heat exchanger, store as float T1Temp
     T2Temp = mcp2.readThermocouple(); //T2Temp is bath, store as float T2Temp
-  }
+    }
   */
 
-    T1Temp = mcp1.readThermocouple(); //T1Temp is heat exchanger, store as float T1Temp
-    T2Temp = mcp2.readThermocouple(); //T2Temp is bath, store as float T2Temp
+  T1Temp = mcp1.readThermocouple(); //T1Temp is heat exchanger, store as float T1Temp
+  T2Temp = mcp2.readThermocouple(); //T2Temp is bath, store as float T2Temp
 
   /* Display refresh*/
   if (CurrentTime - PreviousDisplayTime > DisplayInterval) // display interval is 100ms, so: if 100ms has passed, then the lcd and serial monitors will print info
@@ -525,13 +534,13 @@ void loop()
 
 
   /* DAC Output Temperature  */ /*
-  if (CurrentTime - PreviousDACTime > DACInterval) //DAC Interval is 1ms, aka 1000Hz
-  {
+    if (CurrentTime - PreviousDACTime > DACInterval) //DAC Interval is 1ms, aka 1000Hz
+    {
     PreviousDACTime = CurrentTime; //update the previous time from 0 to when it was done
 
     //Previous DAC output script causes error in thermocuple function somehow, need to revise.
-  }
-*/
+    }
+  */
 
   /* Heat On/Off Switch*/
   if (CurrentTime - PreviousHeatEnableTime > HeatEnableInterval) //Heat switch state unterval is 50ms. SO if 50ms pass, check the heat control button
@@ -667,6 +676,93 @@ void loop()
 
     HeatRampSetupState = 0; //reset the setup state so if another ramp selected, you will be prompted to select heat ramp temp/
   }
+
+  /* Cold Ramp Temperature Selection */
+  //in its current form, this means baseline heating will not occur while selecting temperature.
+  if (CurrentTime - PreviousColdRampSetupTime > ColdRampSetupInterval) //every 50ms check button 1 and if it is pressed, begin the heat ramp setup
+  {
+    PreviousColdRampSetupTime = CurrentTime; //update the previous time with the current time
+    if (digitalRead(YellowButtonSignal2Pin) == HIGH) //if the first yellow button is pressed
+    {
+      digitalWrite(YellowLEDPin, HIGH); //turn the busy light on
+      digitalWrite(GreenButtonLEDPin, HIGH); //turn green button LED on to indicated it can be operated
+      while (ColdRampSetupState == 0) //while the heat ramp temp has not been set do the following:
+      {
+        ColdRampTempInteger = map(analogRead(PotPin1), 0, 4095, 0 , 5000); //map the 10-turn potentiometer to 0-50 degrees C
+        ColdRampTemp = (float)ColdRampTempInteger / 100; //pass heatramptempinteger as a float so it can be divided into non whole numbers and store float
+        lcd.clear(); //clear the LCD and print the baseline temperature annotation
+        lcd.setCursor(0, 0);
+        lcd.print("   Cold Ramp Temp   ");
+        lcd.setCursor(0, 1);
+        lcd.print("        "), lcd.print(ColdRampTemp);
+        lcd.setCursor(0, 2);
+        lcd.print(" Press Green Button");
+        lcd.setCursor(0, 3);
+        lcd.print("     To Confirm     ");
+        if (digitalRead(GreenButtonSignalPin) == HIGH) //if the green button is pressed then:
+        {
+          digitalWrite(GreenButtonLEDPin, LOW); //turn the button led off
+          ColdRampSetupState = 1; //make the state of the heat ramp to 1, marking it as chosen, and exit the while() loop
+        }
+        delay(100); //delay used here rather than millis() as no other loops required to run while selecting the heat ramp temp.
+      }
+      while (ColdRampSetupState == 1) //while the state is 1, i.e. the ramp rmp has been set
+      {
+        lcd.clear(); //clear the LCD and print the baseline temperature annotation
+        lcd.setCursor(0, 1);
+        lcd.print(" Press Green Button ");
+        lcd.setCursor(0, 2);
+        lcd.print(" To Begin Cold Ramp ");
+        if (digitalRead(GreenButtonSignalPin) == HIGH) //if the green button is pressed then:
+        {
+          digitalWrite(GreenButtonLEDPin, LOW); //turn the button led off
+          ColdRampSetupState = 2; //make the state of the heat ramp to 2, marking it as chosen, and exit the while() loop
+        }
+        delay(100); //delay used here rather than millis() as no other loops required to run while selecting the heat ramp temp.
+      }
+
+    }
+  }
+
+  /* Heat Ramp Execution*/
+  if ((CurrentTime - PreviousColdRampTime > ColdRampInterval) && (ColdRampSetupState == 2)) //if 10ms has past and heatramp setup is completed, then do the following
+  {
+    PreviousColdRampTime = CurrentTime; //update the previous time with the current time
+    ColdRampState = 1; //if the ramp has been set up, set the heat ramp state to 1
+    while (ColdRampState == 1) //while the heat ramp state is 1
+    {
+      if ((T2Temp < HeatRampTemp) && (HeatEnable == 1)) // if temp is lower than HeatRampTemp, heat at full power if heating is enabled
+      {
+        analogWrite(HeatPWMPin, 4096); //100% duty cycle aka full power
+      }
+
+      else if ((T2Temp > HeatRampTemp) && (T2Temp < (HeatRampTemp + 1)) && (HeatEnable == 1)) //if temp is just above temp, then heat with 50% power
+      {
+        analogWrite(HeatPWMPin, 2048); //50% duty cycle, aka 50 % power
+      }
+
+      else if ((T2Temp > (HeatRampTemp + 1)) && (HeatEnable == 1)) //if temp is above the target temp, then heat at 25% power if heat in ON
+      {
+        analogWrite(HeatPWMPin, 1024); //25% duty cycle, aka 25% power
+      }
+
+      if ((T2Temp > HeatRampTemp) && (AlreadyRun == false)) //because of boolean, this will only be run once
+      {
+        HoldTempTime = CurrentTime; //this function starts the timer so we can hold the temperature for a few seconds
+        AlreadyRun == true;
+      }
+
+      if (CurrentTime - HoldTempTime > ColdRampHoldTime) //if it has been at temperature for more than 3000ms, then
+      {
+        ColdRampState = 0; //reset the heat ramp state, causing exit of the while() loop
+        AlreadyRun == false; //reset the already run boolean
+      }
+    }
+
+
+    ColdRampSetupState = 0; //reset the setup state so if another ramp selected, you will be prompted to select heat ramp temp/
+  }
+
 
 
 
