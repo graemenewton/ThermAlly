@@ -603,7 +603,7 @@ void loop()
       {
         HeatRampTempInteger = map(analogRead(PotPin1), 0, 4095, 0 , 5000); //map the 10-turn potentiometer to 0-50 degrees C
         HeatRampTemp = (float)HeatRampTempInteger / 100; //pass heatramptempinteger as a float so it can be divided into non whole numbers and store float
-        lcd.clear(); //clear the LCD and print the baseline temperature annotation
+        lcd.clear(); //clear the LCD and print the heat temperature annotation
         lcd.setCursor(0, 0);
         lcd.print("   Heat Ramp Temp   ");
         lcd.setCursor(0, 1);
@@ -672,25 +672,23 @@ void loop()
         AlreadyRun == false; //reset the already run boolean
       }
     }
-
-
     HeatRampSetupState = 0; //reset the setup state so if another ramp selected, you will be prompted to select heat ramp temp/
   }
 
   /* Cold Ramp Temperature Selection */
   //in its current form, this means baseline heating will not occur while selecting temperature.
-  if (CurrentTime - PreviousColdRampSetupTime > ColdRampSetupInterval) //every 50ms check button 1 and if it is pressed, begin the heat ramp setup
+  if (CurrentTime - PreviousColdRampSetupTime > ColdRampSetupInterval) //every 50ms check button 1 and if it is pressed, begin the cold ramp setup
   {
     PreviousColdRampSetupTime = CurrentTime; //update the previous time with the current time
     if (digitalRead(YellowButtonSignal2Pin) == HIGH) //if the first yellow button is pressed
     {
       digitalWrite(YellowLEDPin, HIGH); //turn the busy light on
       digitalWrite(GreenButtonLEDPin, HIGH); //turn green button LED on to indicated it can be operated
-      while (ColdRampSetupState == 0) //while the heat ramp temp has not been set do the following:
+      while (ColdRampSetupState == 0) //while the cold ramp temp has not been set do the following:
       {
         ColdRampTempInteger = map(analogRead(PotPin1), 0, 4095, 0 , 5000); //map the 10-turn potentiometer to 0-50 degrees C
-        ColdRampTemp = (float)ColdRampTempInteger / 100; //pass heatramptempinteger as a float so it can be divided into non whole numbers and store float
-        lcd.clear(); //clear the LCD and print the baseline temperature annotation
+        ColdRampTemp = (float)ColdRampTempInteger / 100; //pass coldramptempinteger as a float so it can be divided into non whole numbers and store float
+        lcd.clear(); //clear the LCD and print the cold temperature annotation
         lcd.setCursor(0, 0);
         lcd.print("   Cold Ramp Temp   ");
         lcd.setCursor(0, 1);
@@ -702,11 +700,11 @@ void loop()
         if (digitalRead(GreenButtonSignalPin) == HIGH) //if the green button is pressed then:
         {
           digitalWrite(GreenButtonLEDPin, LOW); //turn the button led off
-          ColdRampSetupState = 1; //make the state of the heat ramp to 1, marking it as chosen, and exit the while() loop
+          ColdRampSetupState = 1; //make the state of the cold ramp to 1, marking it as chosen, and exit the while() loop
         }
-        delay(100); //delay used here rather than millis() as no other loops required to run while selecting the heat ramp temp.
+        delay(100); //delay used here rather than millis() as no other loops required to run while selecting the cold ramp temp.
       }
-      while (ColdRampSetupState == 1) //while the state is 1, i.e. the ramp rmp has been set
+      while (ColdRampSetupState == 1) //while the state is 1, i.e. the ramp has been set
       {
         lcd.clear(); //clear the LCD and print the baseline temperature annotation
         lcd.setCursor(0, 1);
@@ -720,33 +718,32 @@ void loop()
         }
         delay(100); //delay used here rather than millis() as no other loops required to run while selecting the heat ramp temp.
       }
-
     }
   }
 
-  /* Heat Ramp Execution*/
+  /* Cold Ramp Execution*/
   if ((CurrentTime - PreviousColdRampTime > ColdRampInterval) && (ColdRampSetupState == 2)) //if 10ms has past and heatramp setup is completed, then do the following
   {
     PreviousColdRampTime = CurrentTime; //update the previous time with the current time
-    ColdRampState = 1; //if the ramp has been set up, set the heat ramp state to 1
-    while (ColdRampState == 1) //while the heat ramp state is 1
+    ColdRampState = 1; //if the ramp has been set up, set the cold ramp state to 1
+    while (ColdRampState == 1) //while the cold ramp state is 1
     {
-      if ((T2Temp < HeatRampTemp) && (HeatEnable == 1)) // if temp is lower than HeatRampTemp, heat at full power if heating is enabled
+      if (T2Temp > ColdRampTemp) // if temp is higher than coldRampTemp, no heating
       {
-        analogWrite(HeatPWMPin, 4096); //100% duty cycle aka full power
+        analogWrite(HeatPWMPin, 0); //0% duty cycle aka no heating
       }
 
-      else if ((T2Temp > HeatRampTemp) && (T2Temp < (HeatRampTemp + 1)) && (HeatEnable == 1)) //if temp is just above temp, then heat with 50% power
-      {
-        analogWrite(HeatPWMPin, 2048); //50% duty cycle, aka 50 % power
-      }
-
-      else if ((T2Temp > (HeatRampTemp + 1)) && (HeatEnable == 1)) //if temp is above the target temp, then heat at 25% power if heat in ON
+      else if ((T2Temp < ColdRampTemp) && (T2Temp > (ColdRampTemp - 1)) && (HeatEnable == 1)) //if temp is just below temp, then heat with 50% power
       {
         analogWrite(HeatPWMPin, 1024); //25% duty cycle, aka 25% power
       }
 
-      if ((T2Temp > HeatRampTemp) && (AlreadyRun == false)) //because of boolean, this will only be run once
+      else if ((T2Temp < (ColdRampTemp - 1)) && (HeatEnable == 1)) //if temp is below the target temp-1, then heat at 100% power if heat in ON
+      {
+        analogWrite(HeatPWMPin, 4096); //100% duty cycle, aka 100% power
+      }
+
+      if ((T2Temp < ColdRampTemp) && (AlreadyRun == false)) //because of boolean, this will only be run once
       {
         HoldTempTime = CurrentTime; //this function starts the timer so we can hold the temperature for a few seconds
         AlreadyRun == true;
@@ -758,12 +755,8 @@ void loop()
         AlreadyRun == false; //reset the already run boolean
       }
     }
-
-
     ColdRampSetupState = 0; //reset the setup state so if another ramp selected, you will be prompted to select heat ramp temp/
   }
-
-
 
 
 }
