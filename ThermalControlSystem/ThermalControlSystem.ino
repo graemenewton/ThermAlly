@@ -217,7 +217,7 @@ void setup()
   lcd.print("  Thermal Control");
   lcd.setCursor(0, 2);
   lcd.print("System Initialising");
-  delay(2000);
+  delay(1000);
 
   /* Begin serial communication at 115200 baud */
 
@@ -234,7 +234,7 @@ void setup()
   lcd.print("      Checking      ");
   lcd.setCursor(0, 2); //set to start at lower middle left
   lcd.print("    Thermocouples   ");
-  delay(2000); //wait for 2 secs before starting new command to allow message to be on screen for long enough for user
+  delay(1000); //wait for 2 secs before starting new command to allow message to be on screen for long enough for user
   lcd.clear(); //clear lcd
 
   /* Initialise the driver with I2C_ADDRESS and the default I2C bus for TC1. */
@@ -405,7 +405,7 @@ void setup()
     case MCP9600_ADCRESOLUTION_12:   lcd.print("12"); break;
   }
   lcd.print(".");
-  delay(5000); //wait to allow user to read
+  delay(2000); //wait to allow user to read
   lcd.clear();
 
   /* Code can be added here to set alerts. These can be used for safety features such as to shut off in the case of overheating. */
@@ -551,12 +551,16 @@ void loop()
       if (HeatEnable == 0) //if the state was OFF, turn it ON
       {
         HeatEnable = 1; //make the state ON
+        digitalWrite(YellowButtonLED1Pin, HIGH);
+        digitalWrite(YellowButtonLED2Pin, HIGH);
         digitalWrite(YellowButtonLED4Pin, HIGH); //turn button 4 LED ON
         digitalWrite(GreenLEDPin, HIGH);
       }
       else if (HeatEnable == 1) //if the state was ON, turn it OFF
       {
         HeatEnable = 0; // make the state OFF
+        digitalWrite(YellowButtonLED1Pin, LOW);
+        digitalWrite(YellowButtonLED2Pin, LOW);
         digitalWrite(YellowButtonLED4Pin, LOW); //turn button 4 LED off
         digitalWrite(GreenLEDPin, LOW);
       }
@@ -633,18 +637,26 @@ void loop()
         }
         delay(100); //delay used here rather than millis() as no other loops required to run while selecting the heat ramp temp.
       }
-
+      digitalWrite(YellowLEDPin, LOW);
     }
   }
 
 
   /* Heat Ramp Execution*/
-  if ((CurrentTime - PreviousHeatRampTime > HeatRampInterval) && (HeatRampSetupState == 2)) //if 10ms has past and heatramp setup is completed, then do the following
+  if (/*(CurrentTime - PreviousHeatRampTime > HeatRampInterval) &&*/ (HeatRampSetupState == 2)) //if 10ms has past and heatramp setup is completed, then do the following
   {
-    PreviousHeatRampTime = CurrentTime; //update the previous time with the current time
+    /*PreviousHeatRampTime = CurrentTime; //update the previous time with the current time*/
     HeatRampState = 1; //if the ramp has been set up, set the heat ramp state to 1
     while (HeatRampState == 1) //while the heat ramp state is 1
     {
+      digitalWrite(RedLEDPin, HIGH);
+      digitalWrite(YellowLEDPin, HIGH);
+      lcd.clear(); //clear the LCD and print the baseline temperature annotation
+      lcd.setCursor(0, 1);
+      lcd.print("    Ramping To    ");
+      lcd.setCursor(0, 2);
+      lcd.print("        "); lcd.print(HeatRampTemp);
+      delay(50);
       if ((T2Temp < HeatRampTemp) && (HeatEnable == 1)) // if temp is lower than HeatRampTemp, heat at full power if heating is enabled
       {
         analogWrite(HeatPWMPin, 4096); //100% duty cycle aka full power
@@ -672,7 +684,9 @@ void loop()
         AlreadyRun == false; //reset the already run boolean
       }
     }
-    HeatRampSetupState = 0; //reset the setup state so if another ramp selected, you will be prompted to select heat ramp temp/
+    HeatRampSetupState = 0; //reset the setup state so if another ramp selected, you will be prompted to select heat ramp temp
+    digitalWrite(RedLEDPin, LOW);
+    digitalWrite(YellowLEDPin, LOW);
   }
 
   /* Cold Ramp Temperature Selection */
@@ -718,16 +732,25 @@ void loop()
         }
         delay(100); //delay used here rather than millis() as no other loops required to run while selecting the heat ramp temp.
       }
+      digitalWrite(YellowLEDPin, LOW);
     }
   }
 
   /* Cold Ramp Execution*/
-  if ((CurrentTime - PreviousColdRampTime > ColdRampInterval) && (ColdRampSetupState == 2)) //if 10ms has past and heatramp setup is completed, then do the following
+  if (/*(CurrentTime - PreviousColdRampTime > ColdRampInterval) && */(ColdRampSetupState == 2)) //if 10ms has past and heatramp setup is completed, then do the following
   {
-    PreviousColdRampTime = CurrentTime; //update the previous time with the current time
+    /*PreviousColdRampTime = CurrentTime; //update the previous time with the current time*/
     ColdRampState = 1; //if the ramp has been set up, set the cold ramp state to 1
     while (ColdRampState == 1) //while the cold ramp state is 1
     {
+      digitalWrite(RedLEDPin, HIGH);
+      digitalWrite(YellowLEDPin, HIGH);
+      lcd.clear(); //clear the LCD and print the baseline temperature annotation
+      lcd.setCursor(0, 1);
+      lcd.print("    Ramping To    ");
+      lcd.setCursor(0, 2);
+      lcd.print("        "); lcd.print(ColdRampTemp);
+      delay(50);
       if (T2Temp > ColdRampTemp) // if temp is higher than coldRampTemp, no heating
       {
         analogWrite(HeatPWMPin, 0); //0% duty cycle aka no heating
@@ -755,7 +778,9 @@ void loop()
         AlreadyRun == false; //reset the already run boolean
       }
     }
-    ColdRampSetupState = 0; //reset the setup state so if another ramp selected, you will be prompted to select heat ramp temp/
+    ColdRampSetupState = 0; //reset the setup state so if another ramp selected, you will be prompted to select heat ramp temp
+    digitalWrite(RedLEDPin, LOW);
+    digitalWrite(YellowLEDPin, LOW);
   }
 
 
