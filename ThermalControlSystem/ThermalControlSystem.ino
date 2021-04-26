@@ -680,7 +680,7 @@ void loop()
         {
           analogWrite(HeatPWMPin, 2048); //50% duty cycle, aka 50 % power
         }
-
+//ADD A MILLIS() HERE TO USE AS A TIMER BEFORE EXITING LOOP
         HeatRampState = 0;
       }
     }
