@@ -680,12 +680,18 @@ void loop()
         {
           analogWrite(HeatPWMPin, 2048); //50% duty cycle, aka 50 % power
         }
-//ADD A MILLIS() HERE TO USE AS A TIMER BEFORE EXITING LOOP
-        HeatRampState = 0;
+        if (CurrentTime - HoldTempTime > HeatRampHoldTime) //if it has been 3000ms since temp reached then exit loop
+          HeatRampState = 0; //cause exit from while() loop
+      }
+      if ((T2Temp > HeatRampTemp) && (AlreadyRun == false)) //if temp has been reached, start the clock (run once due to boolean operator)
+      {
+        HoldTempTime = CurrentTime;
+        AlreadyRun = true;
       }
     }
     HeatRampSetupState = 0; //reset the setup state so if another ramp selected, you will be prompted to select heat ramp temp
-
+    AlreadyRun = false; //reset boolean
+    
     if (HeatRampState == 0);
     {
       digitalWrite(RedLEDPin, LOW);
@@ -695,7 +701,7 @@ void loop()
       lcd.print("        Ramp");
       lcd.setCursor(0, 2);
       lcd.print("     Complete!");
-      delay(1000);
+      delay(500);
     }
 
   }
