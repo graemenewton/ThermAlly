@@ -662,7 +662,7 @@ void loop()
 
       CurrentTime = millis();
       T2Temp = mcp2.readThermocouple(); //T2Temp is bath, store as float T2Temp
-      LEDTempColour();
+      LEDTempColour(); //updates the LED colour while ramping
 
       if (CurrentTime - PreviousRampDisplayTime > RampDisplayInterval) //update display every 100ms
       {
