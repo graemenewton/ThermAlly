@@ -628,6 +628,7 @@ void loop()
       }
       while (HeatRampSetupState == 1) //while the state is 1, i.e. the ramp rmp has been set
       {
+        digitalWrite(GreenButtonLEDPin, HIGH);
         lcd.clear(); //clear the LCD and print the baseline temperature annotation
         lcd.setCursor(0, 1);
         lcd.print(" Press Green Button ");
@@ -725,6 +726,7 @@ void loop()
     PreviousColdRampSetupTime = CurrentTime; //update the previous time with the current time
     if (digitalRead(YellowButtonSignal2Pin) == HIGH) //if the 2nd yellow button is pressed
     {
+      ColdRampSetupState = 0;
       digitalWrite(YellowLEDPin, HIGH); //turn the busy light on
       digitalWrite(GreenButtonLEDPin, HIGH); //turn green button LED on to indicated it can be operated
       while (ColdRampSetupState == 0) //while the cold ramp temp has not been set do the following:
@@ -749,6 +751,7 @@ void loop()
       }
       while (ColdRampSetupState == 1) //while the state is 1, i.e. the ramp has been set
       {
+        digitalWrite(GreenButtonLEDPin, HIGH);
         lcd.clear(); //clear the LCD and print the baseline temperature annotation
         lcd.setCursor(0, 1);
         lcd.print(" Press Green Button ");
