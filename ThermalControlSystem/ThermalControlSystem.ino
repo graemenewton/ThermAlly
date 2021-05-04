@@ -818,7 +818,7 @@ void loop()
     digitalWrite(RedLEDPin, LOW);
     digitalWrite(YellowLEDPin, LOW);
 
-    if (HeatRampState == 0)
+    if (ColdRampState == 0)
     {
       digitalWrite(RedLEDPin, LOW);
       digitalWrite(YellowLEDPin, LOW);
