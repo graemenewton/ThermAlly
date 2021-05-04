@@ -691,8 +691,8 @@ void loop()
         }
         if (AlreadyRun == false)
         {
-        HoldTempTime = CurrentTime; //HoldTempTime is millis in 3000ms
-        AlreadyRun = true;
+          HoldTempTime = CurrentTime; //HoldTempTime is millis in 3000ms
+          AlreadyRun = true;
         }
       }
 
@@ -773,15 +773,19 @@ void loop()
   /* Cold Ramp Execution*/
   if ((CurrentTime - PreviousColdRampTime > ColdRampInterval) && (ColdRampSetupState == 2)) //if 10ms has past and heatramp setup is completed, then do the following
   {
+    AlreadyRun = false;
     HoldTempTime = 4294967295; //set hold temp time to max before it is masked later, stop an if function running premeaturely
     PreviousColdRampTime = CurrentTime; //update the previous time with the current time
     ColdRampState = 1; //if the ramp has been set up, set the cold ramp state to 1
+    digitalWrite(RedLEDPin, HIGH); //turn red led on
+    digitalWrite(YellowLEDPin, HIGH); //turn yellow led on
+
     while (ColdRampState == 1) //while the cold ramp state is 1
     {
       CurrentTime = millis();
       T2Temp = mcp2.readThermocouple(); //T2Temp is bath, store as float T2Temp
-      digitalWrite(RedLEDPin, HIGH); //turn red led on
-      digitalWrite(YellowLEDPin, HIGH); //turn yellow led on
+      LEDTempColour(); //update the LED colour while ramping
+
       if (CurrentTime - PreviousRampDisplayTime > RampDisplayInterval) //update display every 100ms
       {
         PreviousRampDisplayTime = CurrentTime;
@@ -797,29 +801,25 @@ void loop()
         analogWrite(HeatPWMPin, 0); //0% duty cycle aka no heating
       }
 
-      else if (T2Temp < ColdRampTemp) //if temp is just below temp, then heat with 25% power
+      if (T2Temp < ColdRampTemp) //if temp is just below temp, then heat with 25% power
       {
         if (HeatEnable == 1) //if heating is enabled, then give
         {
           analogWrite(HeatPWMPin, 1024); //25% duty cycle, aka 25% power
         }
-        if (CurrentTime - HoldTempTime > HeatRampHoldTime) //if it has been 3000ms since temp reached then exit loop
+        if (AlreadyRun == false) //if it has been 3000ms since temp reached then exit loop
         {
-          HeatRampState = 0; //cause exit from while() loop
+          HoldTempTime = CurrentTime;
+          AlreadyRun = true;
         }
       }
-
-      if ((T2Temp < ColdRampTemp) && (AlreadyRun == false)) //because of boolean, this will only be run once
+      if (CurrentTime >= (HoldTempTime + 3000)) //if it has been 3000ms since temp reached then exit loop
       {
-        HoldTempTime = CurrentTime; //this function starts the timer so we can hold the temperature for a few seconds
-        AlreadyRun == true;
+        ColdRampState = 0; //cause exit from while() loop
       }
     }
-
     ColdRampSetupState = 0; //reset the setup state so if another ramp selected, you will be prompted to select heat ramp temp
     AlreadyRun = false; //reset boolean
-    digitalWrite(RedLEDPin, LOW);
-    digitalWrite(YellowLEDPin, LOW);
 
     if (ColdRampState == 0)
     {
@@ -833,6 +833,4 @@ void loop()
       delay(500);
     }
   }
-
-
 }
