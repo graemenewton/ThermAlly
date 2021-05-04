@@ -650,7 +650,6 @@ void loop()
   /* Heat Ramp Execution*/
   if ((CurrentTime - PreviousHeatRampTime > HeatRampInterval) && (HeatRampSetupState == 2)) //if 10ms has past and heatramp setup is completed, then do the following
   {
-
     AlreadyRun = false;
     HoldTempTime = 400000000; //set hold temp time to max before it is masked later, stop an if function running premeaturely
     PreviousHeatRampTime = CurrentTime; //update the previous time with the current time
@@ -660,7 +659,6 @@ void loop()
 
     while (HeatRampState == 1) //while the heat ramp state is 1
     {
-
       CurrentTime = millis();
       T2Temp = mcp2.readThermocouple(); //T2Temp is bath, store as float T2Temp
       LEDTempColour(); //updates the LED colour while ramping
