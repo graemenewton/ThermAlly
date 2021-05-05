@@ -814,7 +814,7 @@ void loop()
         
         if (AlreadyRun == false) //if it has been 3000ms since temp reached then exit loop
         {
-          HoldTempTime = CurrentTime;
+          HoldTempTime = CurrentTime; // mask the holdtemptime from being a huge number, to the current time
           AlreadyRun = true;
         }
       }
