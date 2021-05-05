@@ -694,7 +694,7 @@ void loop()
         }
       }
 
-      if (CurrentTime >= (HoldTempTime + 3000)) //if it has been 3000ms since temp reached then exit loop
+      if (CurrentTime > (HoldTempTime + 3000)) //if it has been 3000ms since temp reached then exit loop
       {
         HeatRampState = 0; //cause exit from while() loop
       }
@@ -718,15 +718,16 @@ void loop()
   CurrentTime = millis();
 
   /* Cold Ramp Temperature Selection */
-  //in its current form, this means baseline heating will not occur while selecting temperature.
   if (CurrentTime - PreviousColdRampSetupTime > ColdRampSetupInterval) //every 50ms check button 1 and if it is pressed, begin the cold ramp setup
   {
     PreviousColdRampSetupTime = CurrentTime; //update the previous time with the current time
+    
     if (digitalRead(YellowButtonSignal2Pin) == HIGH) //if the 2nd yellow button is pressed
     {
       ColdRampSetupState = 0;
       digitalWrite(YellowLEDPin, HIGH); //turn the busy light on
       digitalWrite(GreenButtonLEDPin, HIGH); //turn green button LED on to indicated it can be operated
+      
       while (ColdRampSetupState == 0) //while the cold ramp temp has not been set do the following:
       {
         ColdRampTempInteger = map(analogRead(PotPin1), 0, 4095, 0 , 5000); //map the 10-turn potentiometer to 0-50 degrees C
@@ -740,6 +741,7 @@ void loop()
         lcd.print(" Press Green Button");
         lcd.setCursor(0, 3);
         lcd.print("     To Confirm     ");
+        
         if (digitalRead(GreenButtonSignalPin) == HIGH) //if the green button is pressed then:
         {
           digitalWrite(GreenButtonLEDPin, LOW); //turn the button led off
@@ -747,6 +749,7 @@ void loop()
         }
         delay(100); //delay used here rather than millis() as no other loops required to run while selecting the cold ramp temp.
       }
+      
       while (ColdRampSetupState == 1) //while the state is 1, i.e. the ramp has been set
       {
         digitalWrite(GreenButtonLEDPin, HIGH);
@@ -755,11 +758,13 @@ void loop()
         lcd.print(" Press Green Button ");
         lcd.setCursor(0, 2);
         lcd.print(" To Begin Cold Ramp ");
+        
         if (digitalRead(GreenButtonSignalPin) == HIGH) //if the green button is pressed then:
         {
           digitalWrite(GreenButtonLEDPin, LOW); //turn the button led off
           ColdRampSetupState = 2; //make the state of the heat ramp to 2, marking it as chosen, and exit the while() loop
         }
+        
         delay(100); //delay used here rather than millis() as no other loops required to run while selecting the heat ramp temp.
       }
       digitalWrite(YellowLEDPin, LOW);
@@ -772,7 +777,7 @@ void loop()
   if ((CurrentTime - PreviousColdRampTime > ColdRampInterval) && (ColdRampSetupState == 2)) //if 10ms has past and heatramp setup is completed, then do the following
   {
     AlreadyRun = false;
-    HoldTempTime = 4294967295; //set hold temp time to max before it is masked later, stop an if function running premeaturely
+    HoldTempTime = 400000000; //set hold temp time to max before it is masked later, stop an if function running premeaturely
     PreviousColdRampTime = CurrentTime; //update the previous time with the current time
     ColdRampState = 1; //if the ramp has been set up, set the cold ramp state to 1
     digitalWrite(RedLEDPin, HIGH); //turn red led on
@@ -801,17 +806,20 @@ void loop()
 
       if (T2Temp < ColdRampTemp) //if temp is just below temp, then heat with 25% power
       {
+        
         if (HeatEnable == 1) //if heating is enabled, then give
         {
           analogWrite(HeatPWMPin, 1024); //25% duty cycle, aka 25% power
         }
+        
         if (AlreadyRun == false) //if it has been 3000ms since temp reached then exit loop
         {
           HoldTempTime = CurrentTime;
           AlreadyRun = true;
         }
       }
-      if (CurrentTime >= (HoldTempTime + 3000)) //if it has been 3000ms since temp reached then exit loop
+      
+      if (CurrentTime > (HoldTempTime + 3000)) //if it has been 3000ms since temp reached then exit loop
       {
         ColdRampState = 0; //cause exit from while() loop
       }
